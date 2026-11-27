@@ -844,3 +844,187 @@ Everything v9 added is additive: `git revert` the v9 commits on
 `compound-wealth-v9` (or `git checkout` the pre-v9 sha 26fcf35d and
 redeploy). The one behavioural change to a v6 element — the two end labels'
 wording — reverts with the same commits; the cards were never touched.
+
+## 13. The v10 pass — the spending receipt (2026-11-27)
+
+The owner's request, in his words: "On financial perspective, people have
+many purchases that are impulsive or not essential at all — for example
+dozens of 5, 10, 20 dollar subscriptions that go out of pocket by
+automatically extending each month. This money could be saved and invested
+instead. I want a section in Compound Wealth, a UI like a receipt: the user
+adds monthly or annual or daily non-essential purchases and costs … first
+the user combines the prices to see the total, then is reminded how much
+this money could grow if it were invested instead — for example 3
+subscriptions for 3 years. A financial reminder to people to stop
+over-spending and subscribing to trivial stuff which could otherwise be
+invested." Committed as `COMPOUND-WEALTH-V10-PROMPT.md` and
+`COMPOUND-WEALTH-V10-SPEC.md` (the governing spec for the pass); the main
+spec gains the v10 addendum (§5.5, §6.7, one line in §5.4, §11, §12 tests
+48–53, §13.12, Appendix A.3, and the v7-ordering note).
+
+### 13.1 The preflight: the Batch V merge (recorded first, per test 53)
+
+`compound-wealth-v10` was branched from `origin/compound-wealth-v9`
+(the tip `7e315dbb`, the last deployed-good compound state). Main had
+moved on with **Batch V** — the owner's second gold icon pack (commits
+`b417ee41` + `db71c97a`) — which the v9 deploy at 12:29 UTC shipped
+without: the live gold page has been missing the eight pack icons since
+(verified: no `/icons/` references in the live gold HTML at the session
+start). The merge (`git merge origin/main`, commit `b7d2a33f`) was clean
+exactly as predicted: Batch V touches gold-page files, `public/icons/`
+and `tests/batchv/` only; the compound line touches compound files and
+one shared-chrome line. **The v10 deploy from this branch restores the
+icons** — verified live after shipping (§13.7).
+
+### 13.2 The preflight gates (the merged tree, zero drift)
+
+Run before any feature work, all unmodified: **six reference PASS lines,
+103/103 maths, 93/93 harness, 1200/1200 grid + 15/15 UI, lint clean.**
+No drift of any kind — Batch V's changes are pure gold-page additions
+that the compound suites never touch. (Starting state recorded in the
+gate table, §13.6.)
+
+### 13.3 What was built
+
+- **The maths** (`maths.ts`, all additive — the engine untouched): the
+  config block gains `CADENCE_FACTORS` (daily 365/12, weekly 52/12,
+  monthly 1, yearly 1/12), `RECEIPT_HORIZONS` [3, 5, 10] with default 10,
+  `RECEIPT_EXAMPLES` (the three stand-in subscription prices, clearly
+  comment-marked as NOT figures-file data), `RECEIPT_LABEL_MAX` 28,
+  `RECEIPT_AMOUNT_MAX` 999,999, and `RECEIPT_PALETTE` (paper `#fffdf6`,
+  ink `#26333d`, muted `#5a6873`, rule `#aeb8c0` — ink 12.7:1 and muted
+  5.6:1 on the paper, measured). `normalizeToMonthly(amount, cadence)`
+  and `receiptProjection(plan, monthlyTotal, years, figures)` — a thin
+  pure wrapper that builds the receipt's PlanInput (base = the monthly
+  total, never salary mode, startingAmount 0, yearlyIncrease 0, the
+  plan's own costs/rates/inflation) and calls the same `computeCompound`.
+- **The section** (`app.tsx`): between the what-if cards and the More
+  options groups — kicker h2 "The spending receipt" / «رسید خرج‌های شما»
+  (never plain "Receipt": the exchange-receipt tool owns that word), one
+  lede, then the paper card. `id="spending-receipt"`, `data-cw="receipt-*"`
+  throughout (the harness's allowed-prefix list gains `receipt-`).
+- **The paper card** (`src/components/compound/receipt.tsx`, new): the
+  header line, the add form (What / Price / native How-often select /
+  Add, Enter submits, the cadence persists), the one-line hint while the
+  three examples are untouched, the itemised lines (label · dotted leader
+  · exact-to-the-cent price + cadence word · 44px × with label-in-name),
+  Clear all (two-step, 4-second timeout, no `confirm()`), the dashed
+  rules, the totals block (monthly primary, yearly secondary), the
+  projection zone ("If you invested it instead", the 3/5/10 chips, the
+  sentence, the from-line, the v8 share bar on the future values, the
+  assumption line), and the footer (the zinger, the thanks, the
+  decorative barcode of pure divs, `aria-hidden`). A polite live region
+  (add/remove/clear, always with the total) and one sr-only summary
+  paragraph (the v6 chart-summary pattern). The paper keeps its fixed
+  light palette in BOTH themes; EN uses the monospace stack, fa the
+  site's own Persian font; alignment always by layout (flex + dotted
+  leaders), never by font metrics.
+- **The copy** (`content.ts`, a new `receipt` block in both languages —
+  the spec §6 table verbatim plus the few operational strings the
+  interactions need: the default item label, the horizon group label,
+  the announce words, the bar's sr sentence).
+
+### 13.4 Decisions, each with its reason
+
+1. **The projection rides the page's current plan, unfiltered** — "your
+   plan's own assumptions, on your leak money," one rule that is easy to
+   state and test. The receipt live-updates when the plan's asset or
+   costs change (harness v10-13/v10-14). No receipt-side rate inputs.
+2. **The sentence rounds to the nearest 100 with "about"** — the v10
+   spec's own vectors demand it at the leak-money magnitude (5,981.7 →
+   "about 6,000"; 4,551.6 → "about 4,600"), while the main headline's
+   `roundMoney` would say "about 5,990" at 1k–10k. The receipt follows
+   the recorded vectors (magnitude-aware above 100k so huge numbers stay
+   honest); the from-line uses the tiles' own rounding (4,196.4 → 4,200,
+   1,785.3 → 1,790). Both helpers live in receipt.tsx with plain
+   comments.
+3. **The share bar reuses `ShareBar` variant="phone"** — the text-free
+   variant (bar + `role="img"` sr sentence only) with the A4 card's
+   ink-safe `PRINT_COLORS`, which are the right fixed-light pair for a
+   paper card. The visible percentage key line is not repeated (the
+   from-line already names both parts in money) — the deliberate
+   deviation from §5.1.6, as the v10 spec records.
+4. **The hint shows only while the items are exactly the three
+   examples** — it explains the examples; once the list changes it
+   retires itself (self-cleaning, no state, derived).
+5. **The cadence select is native** — the spec asks for it; native
+   selects are the platform's own a11y path, and the keyboard flow works
+   through first-letter navigation (harness v10-9 presses "m" for
+   Monthly).
+6. **Focus returns to Add after the last remove AND after clear-all** —
+   the clear button unmounts with the last row; leaving focus on body
+   would strand keyboard users, so the remove rule is applied to the
+   clear path too.
+7. **Two tiny local digit helpers in receipt.tsx** (normalizeDigits /
+   toFaDigits, 8 lines total, the page's own rule) instead of exporting
+   them from app.tsx — a shared export would create an import cycle
+   (app imports receipt) and churn a file this pass must not disturb.
+   Recorded as self-containment over deduplication at 8 lines.
+8. **The barcode is 30 fixed-width divs from a constant array** —
+   deterministic (no hydration mismatch), ~10 lines of JSX, under the
+   spec's ~20-line budget. The bottom edge is a plain dashed border —
+   the zigzag was cut at the spec's own baseline.
+9. **No new runtime dependencies** — the receipt is one React component
+   and one copy block; the JS delta is the component and its wiring.
+
+### 13.5 Receipt honesty (the spec's own edge list, all live-probed)
+
+Zero items or a zero total hides the projection (paper + hint stay); a
+0% custom rate (net −0.2% after the plan's cost) hides the bar and keeps
+the sentence; a fee of 5,000 that eats the 34.97/mo total falls through
+to the engine's own never-invests plain sentence (the sr summary carries
+it too); today's money always sits beside future money; extreme inputs
+(a 999,999/mo leak, a 2,000,000 typed price clamped with one plain
+message) never give NaN or a broken page.
+
+### 13.6 The gate table (the final state)
+
+| Gate | v9 record | v10 (merged base, pre-feature) | v10 (final) |
+|---|---|---|---|
+| Reference selftest | 6 PASS | 6 PASS | **9 PASS** (the two normalization equalities + the examples' 10y ≈ 5,982) |
+| Maths (`bun test`) | 103/103 | 103/103 | **117/117** (14 new v10 tests) |
+| Browser harness | 93/93 | 93/93 | **113/113** (20 new v10 checks) |
+| Grid replay | 1200/1200 + 15/15 | 1200/1200 + 15/15 | **1200/1200 + 15/15 — byte-identical** |
+| Lint | clean | clean | **clean** |
+| axe (local pre-scan) | 18/17/18/17 | — | **18/17/18/17, zero receipt nodes** (live scan in §13.7) |
+
+### 13.7 The live verification (after the deploy) — see §13.8 for the numbers
+
+Deployed live (the worker at 100% traffic) and verified end-to-end: the
+golden path in EN (examples → A$34.97/mo → the projection → add, remove,
+clear), fa + RTL + dark with Persian digits and ٪, the gold page's pack
+icons restored, screenshots to `docs/compound-tests/v10-live-*.png`,
+zero console/page errors, the live axe scans at the 18/17/18/17 baseline,
+Lighthouse ≥ 98/97, and the JS delta measured honestly from two full
+worker builds (§13.8).
+
+### 13.8 The measured evidence
+
+- **The JS delta, from two full worker builds** (the v9 tip `7e315dbb`
+  built in a worktree, the v10 tree as deployed, both via
+  `opennextjs-cloudflare build` + `wrangler dev`, measured as the
+  browser's actual transfer): **201,118 → 205,003 bytes, +3,885 bytes
+  (~1.9%), 10 JS files before and after** — the new receipt component
+  and its copy and wiring.
+- **axe (light + dark, EN + fa):** the v9 baseline counts hold
+  (18/17/18/17 color-contrast nodes, all pre-existing shared-chrome and
+  chip patterns) — **zero nodes inside the receipt section**, zero new
+  violation kinds. The paper's fixed palette makes this structural.
+- **Lighthouse:** recorded post-deploy in `docs/compound-tests/`
+  (`v10-lighthouse-*.json`), at or above the v8/v9 records (98/97).
+
+### 13.9 The cut list (the spec's Appendix A.3 — v10's own non-goals)
+
+Benchmark or asset comparisons inside the receipt (the chart's v9 filters
+already answer that); an "add this to your plan" button (the receipt never
+mutates the plan); persistence of items (store-nothing); in-place item
+editing (remove and re-add); per-day/per-week total displays; the receipt
+on the A4/phone cards; printing the receipt (the A4 card owns the print
+path); budgeting features; a "cost so far" retrospective; animations.
+
+### 13.10 Rollback
+
+Everything v10 added is additive: `git revert` the v10 commits on
+`compound-wealth-v10` (or `git checkout` the v9 tip `7e315dbb` and
+redeploy). The Batch V merge reverts independently if ever needed. The
+engine, the grid and every pre-v10 number were never touched.

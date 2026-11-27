@@ -186,3 +186,63 @@ with the caption; the numbers invariant; the guard live (the total chip
 pressed and disabled). fa + dark: the Persian group label, chip labels and
 caption, a toggle working. All-on: the v8 look restored (11 paths).
 **Zero console/page errors.** Screenshots `docs/compound-tests/v9-live-01…05`.
+
+## The v10 gate record (the spending receipt, 2026-11-27)
+
+All on the final state, after the Batch V merge (main's gold icon pack,
+clean merge `b7d2a33f` — recorded first, per test 53):
+
+- Reference selftest: **9 PASS lines** (the six v9 lines + the daily
+  3 → 91.25 exact, the yearly 120 → 10 exact, and the examples' 34.97/mo
+  10y ≈ 5,982).
+- Maths: **117/117** (the 103 v9 tests unmodified + 14 new v10 tests:
+  the normalization vectors, the examples' 34.97/419.64, the
+  wrapper-equals-engine proof, the spot and horizon vectors, the owner's
+  127/mo ≈ 21,700, the never-NaN set, the honest edge, the copy keys).
+- Browser harness: **113/113** (the 93 v9 checks unmodified + 20 new
+  v10 checks, v10-1…v10-20; the allowed-prefix list gains `receipt-`).
+- Grid replay: **1200/1200 + 15/15** — the engine byte-identical.
+- Lint: clean. No new runtime dependencies.
+- axe (local pre-scan, light+dark × EN+fa): 18/17/18/17 color-contrast
+  nodes — the exact v9 baseline — with **zero nodes inside the receipt
+  section**.
+
+## The v10 findings this pass recorded (facts and decisions)
+
+1. **"p.a." in the plain-language banned list is a regex metacharacter
+   trap.** Unescaped, `new RegExp("p.a.")` matches any p?a? sequence —
+   the receipt's own "plan" tripped it. The v10 check escapes every
+   banned word before matching. Test 18 (the original bearer) never hit
+   the trap because its first-viewport text contains no p?a? words; its
+   list is left untouched and the finding is recorded here.
+2. **The cadence persistence is the rapid-entry feature, not a bug.**
+   The first harness run "failed" its own expectations twice (the
+   keyboard add and the clamp-test add both inherited the persisted
+   Yearly cadence from the previous check) — the receipts' behaviour was
+   right; the checks were wrong. The corrected checks set the cadence
+   explicitly, and v10-5 proves the persistence itself ($120 yearly adds
+   exactly 10 to the monthly total; the select keeps Yearly after add).
+3. **The dark-theme activation is the site's class toggle, not the
+   media scheme.** The receipt's screenshots first came out light-on-light
+   because `emulateMedia({ colorScheme: "dark" })` does not flip the
+   class-strategy theme; the site's own toggle (or the html class) does.
+   All dark evidence uses the real toggle.
+4. **The paper is fixed light in both themes by design** — element-
+   clipped screenshots of the card are therefore identical across themes;
+   the dark evidence is the card in its dark-page context (and the AA
+   measurement, v10-19, holds in both).
+5. **The examples' own prices are illustrative stand-ins, not
+   figures-file data** — the figures file (spec §7) governs market
+   figures only; the example block carries its own comment in the
+   config.
+
+## The v10 live walk (2026-11-27, post-deploy)
+
+EN mobile 390: the three examples on arrival (A$34.97/mo, A$419.64/yr,
+"about A$6,000 (about A$4,600 in today's money)"); add Netflix 15.98
+(live region announces, the fields clear); $120 yearly adds exactly 10;
+remove Spotify; the two-step clear (with its 4-second timeout); the clamp
+messages (empty, 2,000,000). fa + RTL + dark: «رسید خرج‌های شما», Persian
+digits (۳۴٫۹۷), mirrored leaders, ٪ in the bar's sr sentence. The gold
+page's pack icons restored after the Batch V merge deploy. **Zero
+console/page errors.** Screenshots `docs/compound-tests/v10-live-*.png`.
