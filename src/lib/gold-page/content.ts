@@ -585,8 +585,6 @@ export const UI = {
     ta: {
       eyebrow: "Reference levels",
       title: "Technical analysis of the gold price",
-      subtitle:
-        "Where the price sits against the market's own reference lines: the 200-day average, the classic pivots and the Fibonacci correction levels — in plain words, no jargon, and never a signal.",
       distancePlain: "Gold trades {pct} {dir} — the market is in its {side} stretch.",
       verdictSideExpensive: "expensive",
       verdictSideCheap: "cheap",
@@ -972,7 +970,7 @@ export const UI = {
         "طلا زیر فشار بازدهی واقعی بالا، دلارِ رو به رشد و ازدحام پوزیشن‌های خرید است؛ تنش بازار و تقاضای سپر پولی، وزنه‌های مقابل‌اند.",
       outlookLead: "۱ تا ۳ ماه آینده:",
       chipMonthsLean: "شرایط علیه طلاست",
-      whyTitle: "فاکتورهای شاخص تاثیرگذار کنونی",
+      whyTitle: "فاکتورهای شاخص جهانی تاثیرگذار بر قیمت طلا",
       evidence: "شواهد",
       howItWorks: "چگونه کار می‌کند",
       factorButton: "گشودن توضیح؛ {name}",
@@ -1353,8 +1351,6 @@ export const UI = {
     ta: {
       eyebrow: "سطوح مرجع",
       title: "تحلیل تکنیکال قیمت طلا",
-      subtitle:
-        "قیمت کجای خط‌های مرجعِ خودِ بازار ایستاده: میانگین ۲۰۰ روزه، پیوت‌های کلاسیک و سطوح اصلاح فیبوناچی — با واژهٔ ساده، بدون ژارگون؛ و همیشه توصیف، نه سیگنال.",
       distancePlain: "طلا الان {pct} {dir} است — بازار در دورهٔ {side} خودش ایستاده.",
       verdictSideExpensive: "گران",
       verdictSideCheap: "ارزان",
@@ -1669,9 +1665,10 @@ export const UI = {
     },
     wgc: {
       title: "نگارش ماهانهٔ شورای جهانی طلا",
-      // {jalali} carries the Persian-calendar twin of the reviewed month
-      // («مرور اکتبر ۲۰۲۶ (آبان ۱۴۰۵)») — the card builds it in fa mode.
-      issueLabel: "مرور {month}{jalali}",
+      // {jalali} carries the reviewed month's Jalali twin, the month
+      // name alone («مرور ماه اکتبر (آبان)») — the card builds it in
+      // fa mode; both years retired as redundant (2026-11-27 ask).
+      issueLabel: "مرور ماه {month}{jalali}",
       publishedLabel: "انتشار: {date}",
       fetchedLabel: "بازخوانی: {date}",
       updatedLabel: "به‌روزرسانی: {date}",

@@ -91,6 +91,12 @@ const LINE_ORDER: ReadonlyArray<{ id: LineId; color: string; dashed?: boolean }>
   { id: "spx", color: "var(--color-cmp-spx)" },
 ];
 
+/* the lines' own pastel dial (the owner's 2026-11-27 ask): the chart's
+   lines at the same soft register as the bars above them — the bars
+   carry a 40% fill, the lines a 0.55 stroke, soft yet each leg still
+   distinct against the grid */
+const PASTEL_OPACITY = 0.55;
+
 type WindowKey = "3M" | "6M" | "1Y" | "3Y" | "5Y" | "10Y";
 /* the chips' own order — months then years, everywhere the windows are listed */
 const WINDOW_ORDER: ReadonlyArray<WindowKey> = ["3M", "6M", "1Y", "3Y", "5Y", "10Y"];
@@ -282,12 +288,20 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
           lineWidth: 1.9,
           axis: "right",
           format: (v: number) => `${fmt.num(v, 2)}%`,
+          strokeOpacity: PASTEL_OPACITY,
         });
         continue;
       }
       const indexed = indexTo100(leg.points, window);
       if (indexed === null) continue;
-      out.push({ label: t.assets[line.id], color: line.color, points: indexed, dashed: line.dashed, lineWidth: 2.8 });
+      out.push({
+        label: t.assets[line.id],
+        color: line.color,
+        points: indexed,
+        dashed: line.dashed,
+        lineWidth: 2.8,
+        strokeOpacity: PASTEL_OPACITY,
+      });
     }
     return out;
   }, [data, window, enabled, t.assets, fmt]);
@@ -383,7 +397,11 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
         <p className="m-0 mt-3 type-caption text-[var(--color-text-tertiary)]">{t.unavailable}</p>
       ) : (
         <>
-          <div className="mt-2.5">
+          {/* the chart — full-bleed on phones (the owner's 2026-11-27
+              ask: more width on small screens): the section's own 16px
+              padding pulled back to the screen's edge under sm, the
+              desktop view unchanged */}
+          <div className="mt-2.5 -mx-4 sm:mx-0">
             <TraceChart
               series={series}
               height={300}

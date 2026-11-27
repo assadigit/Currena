@@ -133,10 +133,10 @@ function monthLabel(monthKey: string, locale: Locale): string {
   return `${name} ${yearText}`;
 }
 
-/** The reviewed Gregorian month's Jalali equivalent, «آبان ۱۴۰۵»-style
- *  (the owner's ask: the Persian reader sees the Persian-calendar date
- *  beside the Gregorian one, e.g. «مرور اکتبر ۲۰۲۶ (آبان ۱۴۰۵)»). The
- *  month's LAST day names the Jalali month — the issue lands at the
+/** The reviewed Gregorian month's Jalali equivalent, «آبان»-style (the
+ *  owner's 2026-11-27 ask: the title reads «مرور ماه اکتبر (آبان)» — the
+ *  month NAME alone in the parenthesis, both years retired as redundant).
+ *  The month's LAST day names the Jalali month — the issue lands at the
  *  month's close, so its Persian-calendar address is where it ends. */
 function jalaliMonthLabel(monthKey: string): string | null {
   const year = Number(monthKey.slice(0, 4));
@@ -144,11 +144,10 @@ function jalaliMonthLabel(monthKey: string): string | null {
   if (!Number.isFinite(year) || !Number.isFinite(month) || month < 1 || month > 12) return null;
   const lastDay = new Date(Date.UTC(year, month, 0)); // day 0 of next month = this month's last day
   try {
-    /* composed month-then-year («آبان ۱۴۰۵», the owner's own order) —
-       a single {year, month} format would print the year first */
+    /* the Jalali month name alone («آبان»), its year dropped — the
+       title's own year pair was retired as redundant */
     const m = new Intl.DateTimeFormat("fa-IR-u-ca-persian", { month: "long" }).format(lastDay);
-    const y = new Intl.DateTimeFormat("fa-IR-u-ca-persian", { year: "numeric" }).format(lastDay);
-    return `${m} ${y}`.replace(/\u200f/g, ""); // the RTL mark the formatters inject
+    return m.replace(/\u200f/g, ""); // the RTL mark the formatters inject
   } catch {
     return null;
   }
@@ -204,15 +203,21 @@ export function WgcCard({
   const published = dateWordsOf(issue?.publishedAt, fmt);
   const fetched = dateWordsOf(issue?.fetchedAt, fmt);
 
-  /* the fa issue title carries its Jalali twin (the owner's ask):
-     «مرور اکتبر ۲۰۲۶ (آبان ۱۴۰۵)» */
+  /* the fa issue title (the owner's 2026-11-27 ask):
+     «مرور ماه اکتبر (آبان)» — the month word, no year pair, the
+     Jalali month alone in the parenthesis; EN keeps its own
+     month-and-year label */
   const issueTitle =
     issue !== null
       ? (() => {
           const gregorian = monthLabel(issue.month, locale);
+          const monthNameOnly = (() => {
+            const month = Number(issue.month.slice(5, 7));
+            return MONTHS_FA[month - 1] ?? issue.month;
+          })();
           const jalali = locale === "fa" ? jalaliMonthLabel(issue.month) : null;
           return t.issueLabel
-            .replace("{month}", gregorian)
+            .replace("{month}", locale === "fa" ? monthNameOnly : gregorian)
             .replace("{jalali}", jalali !== null ? ` (${jalali})` : "");
         })()
       : null;

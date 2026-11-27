@@ -148,6 +148,10 @@ export interface TraceSeriesDef {
   fill?: boolean;
   /** The drawn stroke width (default 2; the comparison chart rides wider). */
   lineWidth?: number;
+  /** The stroke's own opacity, 0–1 (the comparison chart's pastel pass:
+   *  the lines at the same soft register as its bars, never the solid
+   *  hue). Default 1. */
+  strokeOpacity?: number;
   /** "left" (default) rides the primary axis; "right" rides its own
    *  honest second scale (a rate beside indexed assets — the house
    *  dual-axis convention the correlation band uses). */
@@ -473,13 +477,16 @@ export function TraceChart({
             ? `${d}L${(model.W - model.padR).toFixed(1)},${(model.H - model.padB).toFixed(1)}L${model.padL.toFixed(1)},${(model.H - model.padB).toFixed(1)}Z`
             : null;
           const axis = s.axis ?? "left";
+          /* the series' own pastel dial (default solid) — the stroke,
+             the end dot and the end label all ride it together */
+          const so = s.strokeOpacity ?? 1;
           return (
             <g key={s.label}>
               {areaD ? <path d={areaD} fill={s.color} opacity={0.1} /> : null}
-              <path d={d} fill="none" stroke={s.color} strokeWidth={s.dashed ? (s.lineWidth ?? 1.4) : (s.lineWidth ?? 2)} strokeLinejoin="round" strokeLinecap="round" strokeDasharray={s.dashed ? "4 3" : undefined} />
+              <path d={d} fill="none" stroke={s.color} strokeWidth={s.dashed ? (s.lineWidth ?? 1.4) : (s.lineWidth ?? 2)} strokeLinejoin="round" strokeLinecap="round" strokeDasharray={s.dashed ? "4 3" : undefined} strokeOpacity={so} />
               {/* the end dot */}
               {s.points.length > 0 ? (
-                <circle cx={model.xOf(pointTime(s.points[s.points.length - 1]!.d))} cy={model.yOf(s.points[s.points.length - 1]!.v, axis)} r={3} fill={s.color} />
+                <circle cx={model.xOf(pointTime(s.points[s.points.length - 1]!.d))} cy={model.yOf(s.points[s.points.length - 1]!.v, axis)} r={3} fill={s.color} fillOpacity={so} />
               ) : null}
             </g>
           );

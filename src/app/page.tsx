@@ -494,17 +494,20 @@ function BriefingCard({ t, fmt, balance, locale, priceLine }: { t: typeof UI.en;
         </p>
       ) : null}
 
-      {/* the horizon line (the owner's ask): the two similar texts —
-          the now-assessment and the 1–3-month chip — merged into ONE
-          line, each clause explicitly labelled: the now read, then the
-          next-1–3-months read, never two boxes saying it twice */}
-      <p className="m-0 mt-2 text-[length:var(--type-label)] leading-relaxed text-[var(--color-text-secondary)]" data-briefing-horizons>
-        <span className="font-semibold">{t.briefing.nowLead}</span>{" "}
-        <span className="font-bold text-[var(--color-chip-ink-attention)]">{t.briefing.assessment}</span>
-        <span aria-hidden="true" className="mx-1.5">·</span>
-        <span className="font-semibold">{t.briefing.outlookLead}</span>{" "}
-        <span className="font-bold text-[var(--color-chip-ink-attention)]">{t.briefing.chipMonthsLean}</span>
-      </p>
+      {/* the horizon rows (the owner's 2026-11-27 ask): the now-assessment
+          and the 1–3-month read, each clause its own PRONOUNCED box — one
+          row per box, the label a small muted eyebrow, the verdict bold
+          inside the alert tint (the calendar chip's own register) */}
+      <div className="mt-2 flex flex-col gap-1.5" data-briefing-horizons>
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-[var(--cr-radius-md)] bg-[var(--color-status-alert)]/10 px-3 py-2 ring-1 ring-[var(--color-status-alert)]/25">
+          <span className="type-caption font-bold text-[var(--color-text-secondary)]">{t.briefing.nowLead}</span>
+          <span className="text-[length:var(--type-label)] font-bold text-[var(--color-chip-ink-attention)]">{t.briefing.assessment}</span>
+        </div>
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 rounded-[var(--cr-radius-md)] bg-[var(--color-status-alert)]/10 px-3 py-2 ring-1 ring-[var(--color-status-alert)]/25">
+          <span className="type-caption font-bold text-[var(--color-text-secondary)]">{t.briefing.outlookLead}</span>
+          <span className="text-[length:var(--type-label)] font-bold text-[var(--color-chip-ink-attention)]">{t.briefing.chipMonthsLean}</span>
+        </div>
+      </div>
 
       {/* the trend table — every window's change in one organized table,
           visible without a click: day · week · month · 3m · 6m · 1y · 5y · YTD.

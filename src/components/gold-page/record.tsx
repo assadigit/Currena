@@ -282,7 +282,9 @@ export function TaBand({ data, t, fmt, locale }: { data: TaPayload; t: AnyT; fmt
           <ChevronDown className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true" />
         </button>
       </div>
-      <p className="m-0 mt-1 type-caption text-[var(--color-text-secondary)]">{t.subtitle}</p>
+      {/* the section's old subtitle line retired (the owner's
+          2026-11-27 ask) — the plain-verdict box below carries the
+          reading; no second sentence above it */}
 
       {/* THE plain verdict — one readable sentence, its own loud gold box */}
       {distSentence ? (
