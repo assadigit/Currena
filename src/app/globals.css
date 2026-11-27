@@ -823,6 +823,12 @@
 .cw-print-sheet .cw-sheet-tiles {
   flex: 1.1;
   display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+/* v8: the row of three tiles, then the share bar under them. */
+.cw-print-sheet .cw-sheet-tiles-row {
+  display: flex;
   gap: 3mm;
 }
 .cw-print-sheet .cw-tile {
@@ -841,6 +847,27 @@
   font-size: 13pt;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
+}
+/* v8: the share bar under the tiles — the same split as the chart's
+   two areas, in the ink-safe palette (greyscale-friendly); the one
+   caption line carries the two percentages in words. */
+.cw-print-sheet .cw-share-bar {
+  margin-top: 2.5mm;
+}
+.cw-print-sheet .cw-share-key {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2mm;
+  margin-top: 1.2mm;
+  font-size: 8pt;
+  font-weight: 600;
+}
+.cw-print-sheet .cw-share-dot {
+  display: inline-block;
+  width: 2.2mm;
+  height: 2.2mm;
+  border-radius: 0.7mm;
 }
 .cw-print-sheet .cw-sheet-milestones {
   flex: 1;

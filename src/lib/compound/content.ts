@@ -104,6 +104,23 @@ export interface CompoundCopy {
        *  {x} = the inflation percent the plan is using (editable). */
       inflationCaption: string; // "Today's money uses average inflation of {x}% a year (last 20 years)."
     };
+    /** v8: the share bar under the tiles — the tiles' proportion drawn
+     *  in the chart's own two colours, so the bar doubles as the chart's
+     *  key. Shares are of the SHOWN money view (follows the toggle). */
+    shareBar: {
+      /** The short caption under the key line, in the existing caption
+       *  style: says the bar uses the chart's colours. */
+      caption: string;
+      /** The sr-only twin (the bar's aria-label). {put} and {growth} are
+       *  ready-made percent words like "62%" / "38%"; the two label
+       *  words come from chart.putInLabel / chart.growthLabel. */
+      sr: string;
+      /** The honest-edge line shown INSTEAD of the bar when today's
+       *  money ends below what was put in (growth negative). */
+      hiddenLine: string;
+      /** Shares under 1% render as this, not a misleading "0%". */
+      underOne: string;
+    };
     milestones: {
       title: string;
       line: string; // "You pass {amount} in {date}."
@@ -135,6 +152,25 @@ export interface CompoundCopy {
       costsHint: string; // the buying-every-3-months hint
       neverInvests: string;
       pendingLine: string;
+      /** v8: the micro-bars' row labels (words only, never numbers —
+       *  the sentence above each set already carries the numbers). */
+      barLabels: {
+        yourPlan: string; // "Your plan"
+        aBitLess: string; // "A bit less"
+        aBitMore: string; // "A bit more"
+        laterStart: string; // "Starting {n} years later"
+        invested: string; // "Invested"
+        inCash: string; // "In cash"
+        beforeCosts: string; // "Before costs"
+        afterCosts: string; // "After costs"
+      };
+      /** v8: one sr-only sentence per card describing the bars' shape. */
+      barSr: {
+        small: string;
+        later: string;
+        cash: string;
+        costs: string;
+      };
     };
     moreOptions: {
       title: string;
@@ -336,6 +372,12 @@ export const COPY: Record<Locale, CompoundCopy> = {
         notYetInvested: "{x} not yet invested",
         inflationCaption: "Today's money uses average inflation of {x}% a year (last 20 years).",
       },
+      shareBar: {
+        caption: "The same two colours as the chart.",
+        sr: "Of the final amount, {put} is money you put in and {growth} is growth. The same two colours as the chart.",
+        hiddenLine: "In today's money, this plan ends below what you put in, so there is no growth share to show.",
+        underOne: "<1%",
+      },
       milestones: {
         title: "Along the way",
         line: "You pass {amount} in {date}.",
@@ -367,6 +409,22 @@ export const COPY: Record<Locale, CompoundCopy> = {
         costsHint: "Costs take a large share of each purchase. Buying every 3 months can help.",
         neverInvests: "With these numbers, the cost eats every purchase, so nothing gets invested.",
         pendingLine: "{x} is still waiting to be invested.",
+        barLabels: {
+          yourPlan: "Your plan",
+          aBitLess: "A bit less",
+          aBitMore: "A bit more",
+          laterStart: "Starting {n} years later",
+          invested: "Invested",
+          inCash: "In cash",
+          beforeCosts: "Before costs",
+          afterCosts: "After costs",
+        },
+        barSr: {
+          small: "Three bars on one scale, rising in step: a bit less, your plan, a bit more.",
+          later: "Two bars on one scale: starting later is the shorter one.",
+          cash: "Two bars on one scale: the same money invested or held as cash.",
+          costs: "Two bars on one scale: the after-costs bar is the shorter one.",
+        },
       },
       moreOptions: {
         title: "More options",
@@ -571,6 +629,12 @@ export const COPY: Record<Locale, CompoundCopy> = {
         notYetInvested: "{x} هنوز سرمایه‌گذاری نشده",
         inflationCaption: "«پول امروز» با میانگین تورم {x}٪ در سال حساب می‌شود (۲۰ سال اخیر).",
       },
+      shareBar: {
+        caption: "همان دو رنگِ نمودار.",
+        sr: "از مبلغ نهایی، {put} پول واردشدهٔ شماست و {growth} رشد. همان دو رنگِ نمودار.",
+        hiddenLine: "به پول امروز، این برنامه زیرِ مبلغ واردشده تمام می‌شود؛ سهمی از رشد برای نمایش نیست.",
+        underOne: "کمتر از ۱٪",
+      },
       milestones: {
         title: "در مسیر",
         line: "در {date} از {amount} عبور می‌کنید.",
@@ -599,6 +663,22 @@ export const COPY: Record<Locale, CompoundCopy> = {
         costsHint: "هزینه سهم زیادی از هر خرید را می‌برد. خرید هر ۳ ماه می‌تواند کمک کند.",
         neverInvests: "با این اعداد، هزینه همهٔ خریدها را می‌خورد و چیزی سرمایه‌گذاری نمی‌شود.",
         pendingLine: "{x} هنوز در انتظار سرمایه‌گذاری است.",
+        barLabels: {
+          yourPlan: "برنامهٔ شما",
+          aBitLess: "کمی کمتر",
+          aBitMore: "کمی بیشتر",
+          laterStart: "شروع {n} سال دیرتر",
+          invested: "سرمایه‌گذاری‌شده",
+          inCash: "به‌صورت نقد",
+          beforeCosts: "پیش از هزینه‌ها",
+          afterCosts: "پس از هزینه‌ها",
+        },
+        barSr: {
+          small: "سه میله در یک مقیاس، پله‌پله بالا می‌روند: کمی کمتر، برنامهٔ شما، کمی بیشتر.",
+          later: "دو میله در یک مقیاس: میلهٔ شروعِ دیرتر کوتاه‌تر است.",
+          cash: "دو میله در یک مقیاس: همان پول، سرمایه‌گذاری‌شده یا نقد نگه‌داشته‌شده.",
+          costs: "دو میله در یک مقیاس: میلهٔ پس از هزینه‌ها کوتاه‌تر است.",
+        },
       },
       moreOptions: {
         title: "گزینه‌های بیشتر",

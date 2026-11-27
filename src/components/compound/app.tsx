@@ -53,6 +53,7 @@ import {
   whatIfLaterStart,
   whatIfSmallChange,
   yearsOfSalary,
+  splitFinal,
   type Country,
   type PlanInput,
   type RateMode,
@@ -73,6 +74,7 @@ import { COPY, type Locale } from "@/lib/compound/content";
 import { ToolsBreadcrumb, ToolsFooter, ToolsHeader, useSiteLocale } from "@/components/compound/chrome";
 import { GrowthChart, type OtherLine } from "@/components/compound/chart";
 import { A4PrintCard, PhoneCard } from "@/components/compound/cards";
+import { MiniBars, ShareBar, type MiniBarRow } from "@/components/compound/bars";
 
 /* =================================================================== *
  * Small helpers                                                       *
@@ -511,6 +513,56 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
   const shownGrowth = shownFinal - shownPutIn;
   const shownMilestones = moneyView === "today" ? result.milestonesToday : result.milestones;
   const pageMilestones = shownMilestones.slice(-MILESTONES_ON_PAGE);
+
+  /* --- v8: the share bar + the what-if mini-bars' rows ---
+   * The shares come from the SHOWN values, so the bar follows the
+   * tiles' money toggle exactly. splitFinal hides itself (null) when
+   * growth is negative or the final is empty — the honest edge. */
+  const shareSplit = React.useMemo(
+    () => splitFinal(shownFinal, shownPutIn),
+    [shownFinal, shownPutIn],
+  );
+
+  /* The mini-bars draw the sentences' own numbers: the base is the
+   * headline final, and each neighbour is base ± the sentence's delta.
+   * Rows whose sentence is hidden (the W1 range guards) drop out too.
+   * The costs pair is the one engine-computed exception: the card's
+   * sentence carries the fees paid, so "before costs" is the same
+   * plan with every cost switched off (fee 0 + yearly cost 0) — the
+   * same engine, run once more, never a hand-tuned width. */
+  const smallBars = React.useMemo<MiniBarRow[]>(() => {
+    if (!small) return [];
+    const rows: MiniBarRow[] = [];
+    if (!small.hideLess) rows.push({ label: t.whatIf.barLabels.aBitLess, value: result.finalValue - small.less });
+    rows.push({ label: t.whatIf.barLabels.yourPlan, value: result.finalValue, mine: true });
+    if (!small.hideMore) rows.push({ label: t.whatIf.barLabels.aBitMore, value: result.finalValue + small.more });
+    return rows;
+  }, [small, result.finalValue, t.whatIf.barLabels]);
+
+  const laterBars = React.useMemo<MiniBarRow[]>(() => {
+    if (later === null) return [];
+    return [
+      { label: t.whatIf.barLabels.yourPlan, value: result.finalValue, mine: true },
+      { label: t.whatIf.barLabels.laterStart.replace("{n}", formatMoney(laterYears, locale)), value: result.finalValue - later },
+    ];
+  }, [later, laterYears, locale, result.finalValue, t.whatIf.barLabels]);
+
+  const cashBars = React.useMemo<MiniBarRow[]>(() => {
+    if (asCash === null) return [];
+    return [
+      { label: t.whatIf.barLabels.invested, value: result.finalValue, mine: true },
+      { label: t.whatIf.barLabels.inCash, value: asCash },
+    ];
+  }, [asCash, result.finalValue, t.whatIf.barLabels]);
+
+  const costBars = React.useMemo<MiniBarRow[]>(() => {
+    if (result.feesShareOfPutIn === null) return [];
+    const before = computeCompound({ ...plan, feePerPurchase: 0, yearlyCost: 0 }, figures, months).finalValue;
+    return [
+      { label: t.whatIf.barLabels.beforeCosts, value: before },
+      { label: t.whatIf.barLabels.afterCosts, value: result.finalValue, mine: true },
+    ];
+  }, [plan, figures, months, result.finalValue, result.feesShareOfPutIn, t.whatIf.barLabels]);
 
   /* --- the headline sentences --- */
   const headline = React.useMemo(() => {
@@ -1064,6 +1116,17 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
               </div>
             ))}
           </div>
+          {/* v8 — the share bar: the tiles' proportion drawn in the chart's
+              own two colours (the bar doubles as the chart's key). It sits
+              directly under the three tiles and follows the money toggle;
+              splitFinal hides it honestly when today's money ends below
+              what was put in. */}
+          <ShareBar
+            split={shareSplit}
+            locale={locale}
+            labels={{ putIn: t.chart.putInLabel, growth: t.chart.growthLabel }}
+            copy={t.shareBar}
+          />
           {/* W3: the inflation caption appears whenever today's money is shown,
               and follows the editable inflation setting. */}
           {moneyView === "today" ? (
@@ -1205,6 +1268,8 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                     {t.whatIf.salarySuffix.replace("{p}", formatPctLocal(small.stepShareOfSalary, locale))}
                   </p>
                 ) : null}
+                {/* v8: the sentence's own three numbers as thin bars. */}
+                {smallBars.length > 0 ? <MiniBars rows={smallBars} sr={t.whatIf.barSr.small} /> : null}
               </div>
             ) : null}
             <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5">
@@ -1236,6 +1301,8 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                       .replace("{x}", fmt(later))
                   : ""}
               </p>
+              {/* v8: your plan against the later start, one scale. */}
+              {laterBars.length > 0 ? <MiniBars rows={laterBars} sr={t.whatIf.barSr.later} /> : null}
             </div>
             {asCash !== null ? (
               <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3.5">
@@ -1243,6 +1310,8 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                 <p className="mt-1 mb-0 text-[13.5px] leading-relaxed text-[var(--color-text-primary)]">
                   {t.whatIf.cash.replace("{x}", fmt(asCash))}
                 </p>
+                {/* v8: invested against in cash, one scale. */}
+                {cashBars.length > 0 ? <MiniBars rows={cashBars} sr={t.whatIf.barSr.cash} /> : null}
               </div>
             ) : null}
             {result.feesShareOfPutIn !== null ? (
@@ -1256,6 +1325,8 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                 {result.feeEatsLargeShare ? (
                   <p className="mt-1 mb-0 text-[11.5px] font-semibold text-[var(--color-chip-ink-watch)]">{t.whatIf.costsHint}</p>
                 ) : null}
+                {/* v8: before and after costs, one scale. */}
+                {costBars.length > 0 ? <MiniBars rows={costBars} sr={t.whatIf.barSr.costs} /> : null}
               </div>
             ) : null}
           </div>
@@ -1492,6 +1563,25 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                 </button>
                 {compareOpen ? (
                   <div className="overflow-x-auto border-t border-[var(--color-border)] px-3.5 py-3 scroll-slim" data-cw="compare-table">
+                    {/* v8: the rows are computed once so the final values
+                        can share one slim proportional bar scale; the bars
+                        sit under the numbers and add no width. */}
+                    {(() => {
+                      const rows = chips.map((chip) => ({
+                        chip,
+                        r: computeCompound(plan, figuresOf(chip), months, {
+                          isCash: chip.id === "cash",
+                        }),
+                      }));
+                      if (rateMode === "custom-rate") {
+                        rows.push({
+                          chip: null,
+                          r: computeCompound({ ...plan }, { r20: null, r30: null }, months),
+                        });
+                      }
+                      const maxFinal = Math.max(...rows.map((x) => x.r.finalValue), 0);
+                      const barW = (v: number) => (maxFinal > 0 ? `${Math.min(100, (v / maxFinal) * 100).toFixed(2)}%` : "0%");
+                      return (
                     <table className="w-full min-w-[420px] border-collapse text-[12.5px]">
                       <thead>
                         <tr className="text-[var(--color-text-tertiary)]">
@@ -1503,19 +1593,32 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                         </tr>
                       </thead>
                       <tbody>
-                        {chips.map((chip) => {
-                          const r = computeCompound(plan, figuresOf(chip), months, {
-                            isCash: chip.id === "cash",
-                          });
-                          const isCurrent = chip.id === asset.id;
+                        {rows.map(({ chip, r }) => {
+                          const isCurrent = chip !== null && chip.id === asset.id;
+                          const label = chip === null
+                            ? t.moreOptions.customWord
+                            : locale === "fa" ? chip.labelFa : chip.labelEn;
                           return (
-                            <tr key={chip.id} className={isCurrent ? "font-bold text-[var(--color-text-primary)]" : "text-[var(--color-text-secondary)]"}>
-                              <td className="py-1.5 pe-2">{locale === "fa" ? chip.labelFa : chip.labelEn}</td>
+                            <tr key={chip === null ? "custom" : chip.id} className={isCurrent ? "font-bold text-[var(--color-text-primary)]" : "text-[var(--color-text-secondary)]"}>
+                              <td className="py-1.5 pe-2">{label}</td>
                               <td className="py-1.5 px-2 text-end tabular-nums" dir="ltr">
                                 {formatPctLocal(r.baselineRate, locale)}
                                 {pctSign(locale)}
                               </td>
-                              <td className="py-1.5 px-2 text-end tabular-nums" dir="ltr">{fmt(r.finalValue)}</td>
+                              <td className="py-1.5 px-2 text-end tabular-nums" dir="ltr">
+                                {fmt(r.finalValue)}
+                                {/* v8: the slim proportional bar under the final value. */}
+                                <span className="mt-1 block h-[4px] w-full overflow-hidden rounded-full bg-[color-mix(in_srgb,var(--color-border)_55%,var(--color-surface))]" aria-hidden="true">
+                                  <span
+                                    className="block h-full rounded-full"
+                                    style={{
+                                      width: barW(r.finalValue),
+                                      background: isCurrent ? "var(--color-accent-gold)" : "var(--color-text-secondary)",
+                                    }}
+                                    data-cw="compare-bar"
+                                  />
+                                </span>
+                              </td>
                               <td className="py-1.5 px-2 text-end tabular-nums text-[var(--color-text-tertiary)]" dir="ltr">
                                 {r.lowFinal !== null ? fmt(r.lowFinal) : "·"}
                               </td>
@@ -1525,22 +1628,10 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
                             </tr>
                           );
                         })}
-                        {rateMode === "custom-rate" ? (
-                          <tr className="text-[var(--color-text-secondary)]">
-                            <td className="py-1.5 pe-2">{t.moreOptions.customWord}</td>
-                            <td className="py-1.5 px-2 text-end tabular-nums" dir="ltr">
-                              {formatPctLocal(customRate, locale)}
-                              {pctSign(locale)}
-                            </td>
-                            <td className="py-1.5 px-2 text-end tabular-nums" dir="ltr">
-                              {fmt(computeCompound({ ...plan }, { r20: null, r30: null }, months).finalValue)}
-                            </td>
-                            <td className="py-1.5 px-2 text-end">·</td>
-                            <td className="py-1.5 ps-2 text-end">·</td>
-                          </tr>
-                        ) : null}
                       </tbody>
                     </table>
+                      );
+                    })()}
                   </div>
                 ) : null}
               </div>

@@ -15,8 +15,9 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import type { CompoundCopy, Locale } from "@/lib/compound/content";
 import type { AssetRow } from "@/lib/compound/figures";
-import { MILESTONES_ON_CARDS, formatMoney, type CompoundResult, type PlanInput } from "@/lib/compound/maths";
+import { MILESTONES_ON_CARDS, formatMoney, splitFinal, type CompoundResult, type PlanInput } from "@/lib/compound/maths";
 import { GrowthChart } from "@/components/compound/chart";
+import { PRINT_COLORS, PRINT_COLORS_DARK, ShareBar } from "@/components/compound/bars";
 import { CurrenaMark } from "@/components/compound/chrome";
 
 /* =================================================================== *
@@ -279,18 +280,30 @@ export function A4PrintCard({ copy, locale, result, plan, asset, months, startMo
           {/* Tiles + milestones */}
           <div className="cw-sheet-columns">
             <div className="cw-sheet-tiles">
-              <div className="cw-tile">
-                <div className="cw-tile-label">{copy.tool.tiles.youPutIn}</div>
-                <div className="cw-tile-value">{fmt(result.totalPutIn)}</div>
+              <div className="cw-sheet-tiles-row">
+                <div className="cw-tile">
+                  <div className="cw-tile-label">{copy.tool.tiles.youPutIn}</div>
+                  <div className="cw-tile-value">{fmt(result.totalPutIn)}</div>
+                </div>
+                <div className="cw-tile">
+                  <div className="cw-tile-label">{copy.tool.tiles.growthAdded}</div>
+                  <div className="cw-tile-value" style={{ color: style === "dark" ? "#d9a43e" : "#a87e1c" }}>{fmt(result.growth)}</div>
+                </div>
+                <div className="cw-tile">
+                  <div className="cw-tile-label">{copy.tool.tiles.youCouldHave}</div>
+                  <div className="cw-tile-value">{fmt(result.finalValue)}</div>
+                </div>
               </div>
-              <div className="cw-tile">
-                <div className="cw-tile-label">{copy.tool.tiles.growthAdded}</div>
-                <div className="cw-tile-value" style={{ color: style === "dark" ? "#d9a43e" : "#a87e1c" }}>{fmt(result.growth)}</div>
-              </div>
-              <div className="cw-tile">
-                <div className="cw-tile-label">{copy.tool.tiles.youCouldHave}</div>
-                <div className="cw-tile-value">{fmt(result.finalValue)}</div>
-              </div>
+              {/* v8: the share bar under the tiles — the tiles' proportion
+                  in the chart's two inks, percentages in the caption line. */}
+              <ShareBar
+                split={splitFinal(result.finalValue, result.totalPutIn)}
+                locale={locale}
+                labels={{ putIn: copy.tool.chart.putInLabel, growth: copy.tool.chart.growthLabel }}
+                copy={copy.tool.shareBar}
+                variant="print"
+                colors={style === "dark" ? PRINT_COLORS_DARK : PRINT_COLORS}
+              />
             </div>
             <div className="cw-sheet-milestones">
               <div className="cw-sheet-h2">{t.milestonesTitle}</div>
@@ -472,6 +485,23 @@ export function PhoneCard({ copy, locale, result, plan, asset, months, startMont
             <div className="mt-2 text-[12.5px] font-bold" style={{ color: accent }}>
               {planLine}
             </div>
+          </div>
+
+          {/* v8: the share bar as a slim two-segment strip under the big
+              number — the future-money split, text-free (screenshot-safe),
+              with its sr-only twin sentence. */}
+          <div className="w-full max-w-[300px]" data-cw="phone-share-wrap">
+            <ShareBar
+              split={splitFinal(result.finalValue, result.totalPutIn)}
+              locale={locale}
+              labels={{ putIn: copy.tool.chart.putInLabel, growth: copy.tool.chart.growthLabel }}
+              copy={copy.tool.shareBar}
+              variant="phone"
+              colors={{
+                putIn: dark ? "rgba(244,246,249,0.38)" : "rgba(28,37,48,0.30)",
+                growth: accent,
+              }}
+            />
           </div>
 
           <div className="w-full max-w-[300px]">

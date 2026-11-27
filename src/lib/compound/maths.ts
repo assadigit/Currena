@@ -623,6 +623,55 @@ export function whatIfCash(
 }
 
 /* =================================================================== *
+ * The share bar (v8): the tiles' proportion as one honest split       *
+ * =================================================================== */
+
+/** Shares under this are shown as "<1%" rather than a rounded-down
+ *  whole percent (1% = 0.01). */
+export const SHARE_BAR_MIN_SHOWN = 0.01;
+
+/** The two parts of a final value, as shares of that value. */
+export interface FinalSplit {
+  /** The money-you-put-in share, 0..1. */
+  putInShare: number;
+  /** The growth share, 0..1; the two always sum to exactly 1. */
+  growthShare: number;
+}
+
+/**
+ * Split a final value into its two shares for the share bar (v8).
+ *
+ * The honest-edge rule: the bar is drawable only when growth ≥ 0 and
+ * final > 0 — anything else returns null and the page hides the bar
+ * (the today view can make real growth negative; hiding is honest).
+ * The shares are proportions of the SHOWN values (future or today's
+ * money), so the bar follows the tiles' money toggle exactly.
+ */
+export function splitFinal(final: number, putIn: number): FinalSplit | null {
+  if (!Number.isFinite(final) || !Number.isFinite(putIn)) return null;
+  if (final <= 0) return null;
+  const growth = final - putIn;
+  if (growth < 0) return null;
+  // Clamp against float drift, then make the two shares sum to exactly 1.
+  const putInShare = Math.min(1, Math.max(0, putIn / final));
+  return { putInShare, growthShare: 1 - putInShare };
+}
+
+/**
+ * A share's display rounding: whole percents, with shares under
+ * SHARE_BAR_MIN_SHOWN (but above zero) flagged so the page renders
+ * "<1%" instead of a misleading "0%".
+ */
+export function shareRounded(share: number): { pct: number; underOne: boolean } {
+  if (!Number.isFinite(share)) return { pct: 0, underOne: false };
+  const clamped = Math.min(1, Math.max(0, share));
+  return {
+    pct: Math.round(clamped * 100),
+    underOne: clamped > 0 && clamped < SHARE_BAR_MIN_SHOWN,
+  };
+}
+
+/* =================================================================== *
  * Foreign assets in AUD (spec §6.3)                                   *
  * =================================================================== */
 

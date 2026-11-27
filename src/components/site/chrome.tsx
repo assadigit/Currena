@@ -318,7 +318,11 @@ export function SiteHeader({
           <button
             type="button"
             title={t.switchToFarsi}
-            aria-label={t.switchToFarsi}
+            /* Label-in-name (v8, carried from the compound test report's
+               owner decisions): the visible "فا"/"EN" text opens the
+               accessible name, so speech-input users can say what they
+               see. No visual change. */
+            aria-label={`${locale === "en" ? "فا" : "EN"} — ${t.switchToFarsi}`}
             onClick={onToggleLang}
             className={HEADER_BUTTON + " text-sm font-bold"}
           >
