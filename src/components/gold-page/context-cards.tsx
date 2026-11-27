@@ -23,6 +23,7 @@ import type { Locale } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt, SignedDelta } from "@/components/gold-page/visuals";
 import { CountryFlag } from "@/components/gold-page/flags";
+import { PackIcon } from "@/components/gold-page/pack-icon";
 import {
   forecastRetrospective,
   LBMA_2026_MIDYEAR_REVISION,
@@ -390,7 +391,10 @@ export function CurrencyGridCard({
   if (crosses === null) {
     return (
       <div className="flex flex-col gap-1 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
-        <h4 className="m-0 type-label font-bold text-[var(--color-text-primary)]">{t.title}</h4>
+        <h4 className="m-0 flex min-w-0 items-center gap-3 type-label font-bold text-[var(--color-text-primary)]">
+          <PackIcon file="gold-against-major-currencies.png" size={128} className="h-32 w-32" />
+          <span className="min-w-0">{t.title}</span>
+        </h4>
         <p className="m-0 type-caption text-[var(--color-text-tertiary)]">{t.unavailable}</p>
       </div>
     );
@@ -398,8 +402,11 @@ export function CurrencyGridCard({
 
   return (
     <div className="flex flex-col gap-1.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h4 className="m-0 type-label font-bold text-[var(--color-text-primary)]">{t.title}</h4>
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+        <h4 className="m-0 flex min-w-0 items-center gap-3 type-label font-bold text-[var(--color-text-primary)]">
+          <PackIcon file="gold-against-major-currencies.png" size={128} className="h-32 w-32" />
+          <span className="min-w-0">{t.title}</span>
+        </h4>
         <button
           type="button"
           aria-expanded={open}

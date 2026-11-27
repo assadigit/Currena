@@ -30,6 +30,7 @@ import type { Locale, LaneId } from "@/lib/gold-page/content";
 import { LANE_CONTENT, LANE_LEVEL } from "@/lib/gold-page/content";
 import { deskBasePath } from "@/lib/utils";
 import { type Fmt, SignedDelta } from "@/components/gold-page/visuals";
+import { PackIcon } from "@/components/gold-page/pack-icon";
 import {
   CALC_UNITS,
   calcAnswer,
@@ -551,7 +552,10 @@ export function CalculatorBand({
       className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5"
       aria-label={calc.title}
     >
-      <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{calc.title}</h2>
+      <h2 className="m-0 flex items-center gap-4 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
+        <PackIcon file="gold-wealth-calculator.png" size={128} className="h-32 w-32" />
+        {calc.title}
+      </h2>
       <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{showIran ? calc.subtitle : (calc.subtitleNoToman ?? calc.subtitle)}</p>
 
       {/* [1] THE what-if table — if you'd bought gold: 1 week / 1 month /

@@ -28,6 +28,7 @@ import { deskBasePath } from "@/lib/utils";
 import { type Fmt, SignedDelta, TraceChart, type TraceSeriesDef } from "@/components/gold-page/visuals";
 import type { ComparePayload } from "@/lib/gold-page/compare";
 import { CorrelationLeg, type CorrelationPayload } from "@/components/gold-page/record";
+import { PackIcon } from "@/components/gold-page/pack-icon";
 
 const lan = (l: Locale) => (l === "en" ? 0 : 1);
 
@@ -338,7 +339,10 @@ export function CompareBand({ t, locale, fmt, correlation, corrT }: { t: CmpT; l
 
   return (
     <section id="gold-compare" className="gold-anchor-mt mt-3 flex flex-col rounded-[var(--cr-radius-lg)] bg-[var(--color-surface)] p-4 shadow-[var(--cr-shadow-card)] ring-1 ring-[var(--color-border)] sm:mt-5 sm:p-5">
-      <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{t.title}</h2>
+      <h2 className="m-0 flex items-center gap-4 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">
+        <PackIcon file="gold-and-alternative-assets-performance.png" size={128} className="h-32 w-32" />
+        {t.title}
+      </h2>
       <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.subtitle}</p>
 
       {/* the window chips + the line toggles — the window row is COMPACT
