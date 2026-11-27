@@ -407,7 +407,6 @@ export function SpendingReceipt({
             ref={guideButtonRef}
             onClick={() => setGuideOpen(true)}
             aria-haspopup="dialog"
-            aria-label={copy.guideTitle}
             data-cw="receipt-guide-open"
             className="shrink-0 rounded-full px-2 py-[2px] text-[9.5px] font-bold outline-none ring-[var(--color-ring)] transition-shadow focus-visible:ring-2"
             style={{ color: P.muted, boxShadow: `inset 0 0 0 1.5px ${P.rule}` }}
