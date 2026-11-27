@@ -29,7 +29,7 @@
     {
       "id": "15-two-tap-rule",
       "pass": true,
-      "detail": "3 one-tap changes in 237ms"
+      "detail": "3 one-tap changes in 510ms"
     },
     {
       "id": "16-groups-collapsed",

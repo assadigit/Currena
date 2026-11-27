@@ -1213,3 +1213,49 @@ artifact, verified absent from the production build's screenshots.
 
 Revert the v10.1 commits; the v10 tip `4ae32f1d` is the last
 deployed-good compound state.
+
+
+### 14.8 The live record (deployed and verified, 2026-11-27)
+
+Deployed from `compound-wealth-v10` at `b79d9fa1` (the corrected
+invocation — `NEXT_PUBLIC_BASE_PATH=/gold` at build time, the v10
+deploy incident's lesson). The live walk on currena.ir, EN mobile 390:
+the donut under the tiles (dasharray 47.287/52.713, the key naming both
+parts), the 3/2/2 what-if column charts, the receipt with the
+"Examples" tag, the "How to use" pill, A$34.97/mo, the receipt donut at
+70.154%, the guide modal (four steps, aria-modal), add Netflix 15.98 →
+A$50.95 with the tag retired; fa + RTL + dark: «نمونه‌ها», «راهنما»,
+«راهنمای این رسید», Persian digits throughout, the add working in fa;
+the chart with all comparison lines on: 18 text labels, **zero
+geometric collisions**; zero console/page errors on every walk; /gold
+200 with the pack icons intact. Live axe at the exact 18/17/18/17
+baseline with zero nodes inside the new visuals. Live Lighthouse
+(mobile, three runs): performance 99/98/98, accessibility 97/97/97, CLS
+0, TBT 52–130ms. The JS delta measured honestly from two full worker
+builds (the v10 tip `4ae32f1d` in a worktree, the same invocation both
+sides): 204,990 → 206,327 bytes transferred, **+1,337 bytes (~0.65%)**,
+10 JS files before and after.
+
+Two live-walk findings, both fixed and redeployed the same day:
+
+1. **The examples tag retired on a mid-session language toggle** —
+   `examplesUntouched` compared the items' labels against the CURRENT
+   locale's example labels, so EN→fa retired the tag and the hint
+   though the items were untouched. The comparison is now
+   locale-invariant (both languages' labels accepted; the amounts and
+   cadences exact); the harness gains v10.1-4a (the fa tag + hint
+   present after the toggle) — 120/120.
+2. **One live-axe fa node** — the guide pill's aria-label
+   («راهنمای این رسید») did not word-contain its visible text
+   («راهنما»): label-content-name-mismatch. The visible text is already
+   the accessible name; the redundant attribute removed — the four
+   scans return to the exact baseline.
+
+The final VLM pass on the live screenshots (the receipt + modal, the
+fa dark receipt, the all-lines chart) recorded three readbacks against
+the DOM: the sticky bar "clipping" is the spec'd v6 mobile sticky
+summary (content scrolls behind it, scroll-position artifacts in the
+frames); the fa rows' "touching" prices measure 21–91px of leader at
+390px (the 10px floor at 360px, no overlap); the "50,000 obscuring the
+dashes" is the halo working as designed. The "overtakes" annotation and
+the end labels sit inside the SVG (the geometric check: none outside).

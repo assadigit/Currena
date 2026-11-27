@@ -345,3 +345,28 @@ and fa («راهنمای این رسید», four numbered steps, «متوجه ش
 -verified centered and readable with correct RTL mirroring; the
 compare column chart under the table with the gold column on the
 current asset.
+
+
+## The v10.1 live walk (2026-11-27, deployed at b79d9fa1)
+
+The golden path on currena.ir, EN mobile 390 — the donut under the
+tiles (the ring states 47.287/52.846), the what-if column charts
+(3/2/2), the receipt's "Examples" tag and "How to use" pill, A$34.97/mo,
+the receipt donut at 70.154%, the guide modal (four steps, aria-modal,
+Escape + focus verified), add Netflix → A$50.95 with the tag retired;
+fa + RTL + dark — «نمونه‌ها», «راهنما», «راهنمای این رسید»,
+Persian digits, the add working; the chart with all comparison lines —
+18 labels, zero geometric collisions; zero console/page errors on
+every walk. Live axe: the exact 18/17/18/17 baseline, zero nodes inside
+the new visuals. Live Lighthouse (mobile, three runs): performance
+99/98/98, accessibility 97/97/97, CLS 0. The JS delta from two full
+worker builds (the v10 tip in a worktree, same invocation both sides):
+204,990 → 206,327 bytes, +1,337 (~0.65%), 10 files before and after.
+
+Two live findings fixed and redeployed: the examples tag's
+locale-dependent retirement (now locale-invariant; harness v10.1-4a;
+120/120) and the guide pill's redundant aria-label (label-in-name by
+its own visible text now). The final VLM readbacks recorded against
+the DOM: the sticky bar is the spec'd v6 mobile summary; the fa rows'
+leaders measure 21–91px at 390px (the 10px floor at 360px); the
+halo masking the dashes behind "50,000" is the fix working.
