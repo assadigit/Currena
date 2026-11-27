@@ -99,6 +99,7 @@ import { SourcesBand } from "@/components/gold-page/sources";
 import { FuturesBand } from "@/components/gold-page/futures";
 import { FourPricesBand } from "@/components/gold-page/four-prices";
 import { VenuesBand } from "@/components/gold-page/venues";
+import { ThirtySecondsBand } from "@/components/gold-page/thirty-seconds";
 import { dollarTomanOf } from "@/lib/gold-page/coin-premium";
 import { deskBasePath } from "@/lib/utils";
 
@@ -218,6 +219,7 @@ const NAV_SECTIONS: ReadonlyArray<{ id: string; key: keyof typeof UI.en.nav | nu
   { id: "gold-futures", key: null, label: ["Futures", "آتی"] },
   { id: "gold-four-prices", key: null, label: ["Four prices", "چهار قیمت"] },
   { id: "gold-venues", key: null, label: ["Venues", "بازارها"] },
+  { id: "gold-thirty-seconds", key: null, label: ["30 seconds", "۳۰ ثانیه"] },
   { id: "gold-faq", key: null, label: ["FAQ", "پرسش‌ها"] },
   { id: "gold-sources", key: null, label: ["Sources", "منابع"] },
   { id: "gold-relationships", key: null, label: ["Map", "نقشه"] },
@@ -1694,6 +1696,20 @@ export default function GoldPage() {
                 cross-linked to the section that carries its live
                 numbers */}
             <VenuesBand locale={locale} fmt={fmt} />
+
+            {/* "Gold in 30 seconds" + the ATH record watch — the
+                approved item C: the four verdict rows off the SAME trend
+                payload the briefing table uses, the stored-history
+                record watch (never an unqualified "all-time high"),
+                the futures market's own 52-week high, and the
+                why-it-moved line that quotes only fetched numbers */}
+            <ThirtySecondsBand
+              trends={trends.data ?? null}
+              trendsLoading={trends.isLoading}
+              projection={projection.data ?? null}
+              locale={locale}
+              fmt={fmt}
+            />
 
             {/* the beginner FAQ + the page's own mini glossary — the
                 additive programme's Phase 1 (docs/gold-page/PLAN.md): the
