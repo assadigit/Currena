@@ -94,6 +94,8 @@ import { TeCard } from "@/components/gold-page/te-card";
 import { CalendarBand } from "@/components/gold-page/calendar";
 import { ScenariosBand } from "@/components/gold-page/scenarios";
 import { CompareBand } from "@/components/gold-page/compare";
+import { FaqBand } from "@/components/gold-page/faq";
+import { SourcesBand } from "@/components/gold-page/sources";
 import { dollarTomanOf } from "@/lib/gold-page/coin-premium";
 import { deskBasePath } from "@/lib/utils";
 
@@ -210,6 +212,8 @@ const NAV_SECTIONS: ReadonlyArray<{ id: string; key: keyof typeof UI.en.nav | nu
   { id: "gold-dollar-trend", key: null, label: ["Gold vs USD", "طلا و دلار"] },
   { id: "gold-race-yield", key: null, label: ["Gold or USD?", "طلا یا دلار؟"] },
   { id: "gold-calculator", key: null, label: ["Calculator", "ماشین حساب"] },
+  { id: "gold-faq", key: null, label: ["FAQ", "پرسش‌ها"] },
+  { id: "gold-sources", key: null, label: ["Sources", "منابع"] },
   { id: "gold-relationships", key: null, label: ["Map", "نقشه"] },
   { id: "gold-history", key: null, label: ["History", "تاریخ"] },
 ];
@@ -1654,6 +1658,17 @@ export default function GoldPage() {
               projection={projection.data ?? null}
               vault={lbma.data ? <VaultBand data={lbma.data} t={t.vault} fmt={fmt} locale={locale} /> : null}
             />
+
+            {/* the beginner FAQ + the page's own mini glossary — the
+                additive programme's Phase 1 (docs/gold-page/PLAN.md): the
+                ten questions this page hears most, each answer linked to
+                the section that carries its live number */}
+            <FaqBand locale={locale} fmt={fmt} />
+
+            {/* the sources & honesty band — Phase 1: every data source
+                named with what it feeds and how often, the honesty rules,
+                the page-level disclaimer, and the share row */}
+            <SourcesBand locale={locale} />
 
             {/* the relationship map — the forces, the page's closing
                 view: six force families feeding one hub */}
