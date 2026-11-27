@@ -111,6 +111,8 @@ type CalcT = {
   eyebrow: string;
   title: string;
   subtitle: string;
+  /** The Iran-hidden subtitle variant (EN's own): no toman mention. */
+  subtitleNoToman?: string;
   advancedLabel: string;
   modeOne: string;
   modeDca: string;
@@ -376,6 +378,7 @@ export function CalculatorBand({
   windowNames,
   fmt,
   data,
+  showIran,
 }: {
   tm: TmT;
   ib: IbT;
@@ -385,6 +388,10 @@ export function CalculatorBand({
   windowNames: Record<IfWindow, string>;
   fmt: Fmt;
   data: IfBoughtSnapshot | null;
+  /** False when the EN reader has Iran's layer hidden (the owner's
+   *  2026-11-27 ask): the toman unit never appears in the picker, the
+   *  subtitle drops its toman mention. */
+  showIran: boolean;
 }) {
   const [advancedOpen, setAdvancedOpen] = React.useState(false);
   const [query, setQuery] = React.useState<QueryState>({ kind: "idle" });
@@ -545,7 +552,7 @@ export function CalculatorBand({
       aria-label={calc.title}
     >
       <h2 className="m-0 text-[1.25rem] font-extrabold text-[var(--color-text-primary)]">{calc.title}</h2>
-      <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{calc.subtitle}</p>
+      <p className="m-0 mt-1 type-caption leading-relaxed text-[var(--color-text-secondary)]">{showIran ? calc.subtitle : (calc.subtitleNoToman ?? calc.subtitle)}</p>
 
       {/* [1] THE what-if table — if you'd bought gold: 1 week / 1 month /
           3 months / 6 months / 1 year / 5 years, always visible */}
@@ -690,7 +697,7 @@ export function CalculatorBand({
                 className="min-h-[38px] cursor-pointer rounded-[var(--cr-radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-currena-blue)]"
                 aria-label={calc.calcUnitLabel}
               >
-                {CALC_UNITS.filter((u) => (u.kind === "gram" ? calcAsset === "gold" : true)).map((u) => (
+                {CALC_UNITS.filter((u) => (u.kind === "gram" ? calcAsset === "gold" : true) && (showIran || u.id !== "toman")).map((u) => (
                   <option key={u.id} value={u.id} disabled={!unitUsable(u)}>
                     {u.name[lan(locale)]}
                   </option>

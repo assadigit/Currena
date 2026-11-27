@@ -76,6 +76,8 @@ type LongviewT = {
   eyebrow: string;
   title: string;
   subtitle: string;
+  /** The Iran-hidden pp-note variant (EN's own): no toman leg named. */
+  ppNoteNoToman?: string;
   chartAria: string;
   /** the two-century chart's inline-expand toggle (the owner's
    *  2026-11-26 evening ask: the chart hides, the verdict stays) */
@@ -325,11 +327,16 @@ export function LongViewCard({
   t,
   locale,
   fmt,
+  showIran,
 }: {
   liveSpot: number | null;
   t: LongviewT;
   locale: Locale;
   fmt: Fmt;
+  /** False when the EN reader has Iran's layer hidden (the owner's
+   *  2026-11-27 ask): the toman never appears in the machine's currency
+   *  picker, the note drops its toman leg. */
+  showIran: boolean;
 }) {
   /* the chart's own state — the view (all / 100 years) and the Y scale */
   const [view, setView] = React.useState<"all" | "100y">("all");
@@ -362,6 +369,9 @@ export function LongViewCard({
      switch; the owner's original example ($12,000 in 2020) stays the
      USD default. */
   const CCY_IDS = ["usd", "toman", "aud", "cad", "gbp", "eur"] as const;
+  /* the OFFERED set: the toman rides only when Iran's layer shows (the
+     owner's 2026-11-27 ask — the international reader never meets it) */
+  const CCY_OFFERED = showIran ? CCY_IDS : (CCY_IDS.filter((c) => c !== "toman") as unknown as readonly MachineCcyId[]);
   type MachineCcyId = (typeof CCY_IDS)[number];
   const CCY_DEFAULT_AMOUNT: Record<MachineCcyId, number> = {
     usd: 12000,
@@ -391,6 +401,15 @@ export function LongViewCard({
   const [ppYear, setPpYear] = React.useState<number>(2020);
   const [amount, setAmount] = React.useState<number>(12000);
   const [amountText, setAmountText] = React.useState<string>("12000");
+  /* the layer can hide while the toman is picked (the EN reader's own
+     toggle) — the picker falls back to USD, the honest default */
+  React.useEffect(() => {
+    if (showIran || ccy !== "toman") return;
+    setCcy("usd");
+    setAmount(CCY_DEFAULT_AMOUNT.usd);
+    setAmountText(String(CCY_DEFAULT_AMOUNT.usd));
+    setPpYear(CCY_DEFAULT_YEAR.usd);
+  }, [showIran, ccy]);
   React.useEffect(() => {
     if (Number(amountText) === amount) return;
     setAmountText(String(amount));
@@ -413,6 +432,9 @@ export function LongViewCard({
     queryFn: fetchDollarTrend,
     staleTime: 5 * 60 * 1000,
     retry: 1,
+    /* gated by the resolved visibility — the same cache the page's own
+       race legs ride; never fires for the hidden layer */
+    enabled: showIran,
   });
   const fxTable = fx.data?.perUsd ?? null;
   const tomanLegs = React.useMemo<TomanMachineLegs | null>(() => {
@@ -658,7 +680,7 @@ export function LongViewCard({
       <div className="mt-3 flex flex-col gap-2.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-bg-light)] p-3 ring-1 ring-[var(--color-border)]">
         <div>
           <h5 className="m-0 type-label font-bold text-[var(--color-text-primary)]">{t.ppTitle}</h5>
-          <p className="m-0 mt-0.5 type-caption leading-relaxed text-[var(--color-text-secondary)]">{t.ppNote}</p>
+          <p className="m-0 mt-0.5 type-caption leading-relaxed text-[var(--color-text-secondary)]">{showIran ? t.ppNote : (t.ppNoteNoToman ?? t.ppNote)}</p>
         </div>
 
         <div className="flex flex-wrap items-end gap-2.5">
@@ -676,7 +698,7 @@ export function LongViewCard({
               className="min-h-[38px] cursor-pointer rounded-[var(--cr-radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] px-2.5 py-1 text-[length:var(--type-label)] font-bold text-[var(--color-text-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-currena-blue)]"
               aria-label={t.ppCcyLabel}
             >
-              {CCY_IDS.map((c) => (
+              {CCY_OFFERED.map((c) => (
                 <option key={c} value={c}>
                   {t.ppCcyNames[c] ?? c}
                 </option>

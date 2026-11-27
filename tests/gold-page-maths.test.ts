@@ -10,6 +10,12 @@
 
 import { describe, expect, test } from "bun:test";
 import {
+  raceYield,
+  raceYieldSeries,
+  raceYieldYearOptions,
+} from "../src/lib/gold-page/race-yield";
+import type { DollarTrendPayload } from "../src/lib/gold-page/dollar-trend";
+import {
   cagrPercent,
   fxCompleteYearMonths,
   fxLatest,
@@ -172,6 +178,96 @@ describe("the USD machine (the original leg, through the shared tail)", () => {
     expect(purchasingPower(1000, 1800, 3547.9)).toBeNull();
     expect(purchasingPower(0, 2020, 3547.9)).toBeNull();
     expect(purchasingPower(1000, 2020, null)).toBeNull();
+  });
+});
+
+
+/* ------------------------------------------------------------------ *
+ * The race-yield machine — the Iran investor's yield question (the
+ * owner's 2026-11-27 ask). A synthetic payload in the route's own
+ * contract: three complete Jalali years + a live running row.
+ * ------------------------------------------------------------------ */
+const RY: DollarTrendPayload = {
+  v: 1,
+  asOf: "2026-11-27",
+  dollar: [
+    { jy: 1357, toman: 10, basis: "static" },
+    { jy: 1358, toman: 20, basis: "static" },
+    { jy: 1359, toman: 40, basis: "static" },
+  ],
+  gold18: [
+    { jy: 1357, toman: 1000, basis: "parity" },
+    { jy: 1358, toman: 1500, basis: "parity" },
+    { jy: 1359, toman: 3000, basis: "parity" },
+  ],
+  goldUsd: [],
+  running: { jy: 1405, dollarToman: 100000, gold18Toman: 5000000, goldUsdOz: null, live: true },
+};
+
+describe("the race-yield machine (gold or dollars, both in toman)", () => {
+  // Precomputed independently: 10M toman at 1357 buys 10,000 g at
+  // 1,000 or 1,000,000 USD at 10; today marks 5,000,000/gram and
+  // 100,000/dollar: gold 50bn vs dollar 100bn — the dollar won ×2.
+  test("the owner's framing: 10M toman at 1357, the dollar wins", () => {
+    const a = raceYield(RY, 1357, 10_000_000)!;
+    expect(a).not.toBeNull();
+    expect(a.winner).toBe("dollar");
+    expect(a.gold.unitsThen).toBeCloseTo(10_000, 6);
+    expect(a.gold.worth).toBeCloseTo(50_000_000_000, 0);
+    expect(a.dollar.unitsThen).toBeCloseTo(1_000_000, 6);
+    expect(a.dollar.worth).toBeCloseTo(100_000_000_000, 0);
+    expect(a.ratio).toBeCloseTo(0.5, 9);
+    expect(a.endJy).toBe(1405);
+    expect(a.endLive).toBe(true);
+    expect(a.years).toBe(48);
+    expect(a.gold.pct).toBeCloseTo((50_000_000_000 / 10_000_000 - 1) * 100, 6);
+  });
+
+  test("the start year's own prices: 10M at 1358 rides its own legs", () => {
+    const a = raceYield(RY, 1358, 10_000_000)!;
+    expect(a.gold.unitsThen).toBeCloseTo(10_000_000 / 1500, 6);
+    expect(a.dollar.unitsThen).toBeCloseTo(500_000, 6);
+    expect(a.dollar.worth).toBeCloseTo(50_000_000_000, 0);
+    expect(a.gold.worth).toBeCloseTo((10_000_000 / 1500) * 5_000_000, 0);
+    expect(a.winner).toBe("dollar");
+  });
+
+  test("the gold-win case and the honest ratio", () => {
+    const rigged: DollarTrendPayload = {
+      ...RY,
+      running: { ...RY.running, gold18Toman: 20_000_000 },
+    };
+    const a = raceYield(rigged, 1357, 10_000_000)!;
+    expect(a.winner).toBe("gold");
+    expect(a.gold.worth).toBeCloseTo(200_000_000_000, 0);
+    expect(a.ratio).toBeCloseTo(2, 9);
+  });
+
+  test("fail-closed: no money, a year outside the table, a legless year", () => {
+    expect(raceYield(RY, 1357, 0)).toBeNull();
+    expect(raceYield(RY, 1356, 10_000_000)).toBeNull();
+    expect(raceYield(RY, 1405, 10_000_000)).toBeNull(); // the running year itself — no span
+    const legless: DollarTrendPayload = { ...RY, gold18: RY.gold18.slice(0, 1) };
+    expect(raceYield(legless, 1358, 10_000_000)).toBeNull();
+  });
+
+  test("the worth path: every year re-marks both legs at its own prices", () => {
+    const pts = raceYieldSeries(RY, 1357, 10_000_000);
+    expect(pts.map((p) => p.jy)).toEqual([1357, 1358, 1359, 1405]);
+    // the start: both legs worth exactly the invested sum
+    expect(pts[0]!.goldWorth).toBeCloseTo(10_000_000, 6);
+    expect(pts[0]!.dollarWorth).toBeCloseTo(10_000_000, 6);
+    // 1358: 10,000 g at 1,500 = 15M; 1,000,000 USD at 20 = 20M
+    expect(pts[1]!.goldWorth).toBeCloseTo(15_000_000, 6);
+    expect(pts[1]!.dollarWorth).toBeCloseTo(20_000_000, 6);
+    // the running year's live legs
+    expect(pts[3]!.goldWorth).toBeCloseTo(50_000_000_000, 0);
+    expect(pts[3]!.dollarWorth).toBeCloseTo(100_000_000_000, 0);
+  });
+
+  test("the year options: only years with both legs, never the running year", () => {
+    expect(raceYieldYearOptions(RY)).toEqual([1357, 1358, 1359]);
+    expect(raceYieldYearOptions({ ...RY, gold18: RY.gold18.slice(0, 1) })).toEqual([1357]);
   });
 });
 

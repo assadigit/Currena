@@ -166,6 +166,11 @@ export const UI = {
     title: "Gold",
     dataAsOf: "Data as of {date}",
     loadingLine: "Reading the gold meter…",
+    iranToggle: {
+      label: "Show Iran's market",
+      shownLabel: "Hide Iran's market",
+      note: "The Tehran gold market, the toman, and the gold-vs-dollar race — the Iranian reader's own layer.",
+    },
     price: {
       eyebrow: "Gold price (ounce)",
       gramLine: "1 troy ounce = {g} grams",
@@ -483,6 +488,44 @@ export const UI = {
       liveMissed: "The live tail could not be read — the historical layer stands.",
       pendingLine: "Reading the series…",
     },
+    raceYield: {
+      eyebrow: "The Iranian investor's question",
+      title: "Gold or dollars?",
+      subtitle:
+        "The old Tehran debate, answered with the numbers: a sum of toman, invested in any year since 1979, split between gold and the free-market dollar — both marked at today's prices. Pick the year, enter the sum, see which one won.",
+      amountLabel: "The sum (toman)",
+      yearLabel: "Invested in",
+      yearLabelGregorian: "Invested in (Gregorian year)",
+      unitMillion: "M toman",
+      unitBillion: "bn toman",
+      goldCardTitle: "Bought gold",
+      dollarCardTitle: "Bought dollars",
+      goldUnitsThen: "{v} g of 18k gold",
+      dollarUnitsThen: "{v} in US dollars",
+      worthToday: "worth today",
+      totalReturn: "total return",
+      multipleWord: "×{v}",
+      verdictGoldWon:
+        "Gold won: over {years} years the gold leg ended {ratio}× the dollar leg — {gold} against {dollar}.",
+      verdictDollarWon:
+        "The dollar won: over {years} years the dollar leg ended {ratio}× the gold leg — {dollar} against {gold}.",
+      verdictTie: "A tie: both legs ended at the same value.",
+      liveEndNote: "marked at today's live prices",
+      historyEndNote: "marked at the last complete year's prices",
+      chartAria:
+        "What the sum became, year by year: the gold path and the dollar path, both in toman, log scale.",
+      chartGold: "gold",
+      chartDollar: "dollars",
+      scaleLog: "log scale",
+      scaleLinear: "linear",
+      methodOpenLabel: "How it is computed",
+      methodLine:
+        "The sum buys 18-karat gold grams and US dollars at the start year's own Tehran prices — the gold gram at its year-end price (the parity estimate before 1392, the Tehran market price from 1392 on), the dollar at that year's free-market rate (the cited historical table before 1390, TGJU's actuals from 1390 on). Both legs are then re-marked at today's own prices: the live geram18 gram and the live free-market dollar when they arrive, else the last complete year's — named at point of use. The verdict is the honest ratio of the two end values, both in toman. Past returns are no guarantee of future results; this is a description, never advice.",
+      sourceNote: "The same data the 47-year race above rides: the cited free-dollar table, TGJU's price_dollar_rl and geram18 daily rows.",
+      unavailable: "The section could not be read yet; nothing is shown rather than a guess.",
+      pendingLine: "Reading the series…",
+      yearNoAnswer: "This year has no answer yet — its prices are still being read.",
+    },
     longview: {
       eyebrow: "The long view",
       title: "Gold across two centuries",
@@ -515,6 +558,8 @@ export const UI = {
       ppTitle: "The purchasing-power machine",
       ppNote:
         "How much gold a sum could actually buy in a past year — the year's own average price, the same money's buying power today, the contrast in one answer. USD rides the London annual average; the toman rides Tehran's own 18k gold and the free-market dollar; the euro, the pound and the Canadian and Australian dollars ride the London average × that year's average FX.",
+      ppNoteNoToman:
+        "How much gold a sum could actually buy in a past year — the year's own average price, the same money's buying power today, the contrast in one answer. USD rides the London annual average; the euro, the pound and the Canadian and Australian dollars ride the London average × that year's average FX.",
       ppAmountLabel: "The money ({c})",
       ppYearLabel: "The year",
       ppYearJalali: "The year (Jalali)",
@@ -854,6 +899,8 @@ export const UI = {
       title: "The gold calculator",
       subtitle:
         "Every what-if in one place: each window's return, the two-mode wealth calculator (buy once, or buy every month — in dollars, another currency, the toman, or grams of gold), the assets head-to-head — and any past day's meter behind a tap.",
+      subtitleNoToman:
+        "Every what-if in one place: each window's return, the two-mode wealth calculator (buy once, or buy every month — in dollars, another currency, or grams of gold), the assets head-to-head — and any past day's meter behind a tap.",
       advancedLabel: "Open the time machine · any past day",
       modeOne: "One purchase",
       modeDca: "Monthly buying",
@@ -898,6 +945,8 @@ export const UI = {
       updatedLabel: "Updated {date}",
       stateWaiting:
         "No briefing captured yet. The watch fires twice daily — 05:00 and 16:00 UTC (08:30 and 19:30 Tehran); the next fire {time}.",
+      stateWaitingNoTehran:
+        "No briefing captured yet. The watch fires twice daily — 05:00 and 16:00 UTC; the next fire {time}.",
       stateFetchFailed:
         "Trading Economics has not been reachable for {n} fire(s) since {date} — no proxy, no arms race; the last captured briefing stays above, dated.",
       stateAlert:
@@ -935,6 +984,11 @@ export const UI = {
     title: "طلا",
     dataAsOf: "دادهٔ {date}",
     loadingLine: "در حال خواندن سنجهٔ طلا…",
+    iranToggle: {
+      label: "نمایش بازار ایران",
+      shownLabel: "پنهان کردن بازار ایران",
+      note: "بازار طلای تهران، تومان و مسابقهٔ طلا و دلار — لایهٔ خودِ خوانندهٔ ایرانی.",
+    },
     price: {
       eyebrow: "قیمت طلا (اونس)",
       gramLine: "۱ اونس تروی = {g} گرم",
@@ -1248,6 +1302,44 @@ export const UI = {
         "این بخش هنوز خوانده نشد؛ به‌جای حدس، هیچ‌چیز نشان داده نمی‌شود.",
       liveMissed: "دمِ زنده خوانده نشد — بخش تاریخی باقی است.",
       pendingLine: "در حال خواندن سری…",
+    },
+    raceYield: {
+      eyebrow: "پرسشِ همیشگیِ سرمایه‌گذار ایرانی",
+      title: "طلا یا دلار؟",
+      subtitle:
+        "بحثِ همیشگیِ تهران، با عدد پاسخ می‌گیرد: مبلغی تومان، در هر سالی از ۱۳۵۷ تا امروز، نصفش طلا و نصفش دلار — هر دو به قیمت امروز. سال را انتخاب کنید، مبلغ را بنویسید، ببینید کدام برده است.",
+      amountLabel: "مبلغ (تومان)",
+      yearLabel: "سالِ سرمایه‌گذاری",
+      yearLabelGregorian: "سالِ سرمایه‌گذاری (میلادی)",
+      unitMillion: "میلیون تومان",
+      unitBillion: "میلیارد تومان",
+      goldCardTitle: "اگر طلا می‌خرید",
+      dollarCardTitle: "اگر دلار می‌خرید",
+      goldUnitsThen: "{v} گرم طلای ۱۸ عیار",
+      dollarUnitsThen: "{v} دلار آمریکا",
+      worthToday: "امروز می‌ارزد",
+      totalReturn: "بازده کل",
+      multipleWord: "×{v}",
+      verdictGoldWon:
+        "طلا برد: در {years} سال، پای طلا {ratio}× برابرِ پای دلار تمام شد — {gold} در برابر {dollar}.",
+      verdictDollarWon:
+        "دلار برد: در {years} سال، پای دلار {ratio}× برابرِ پای طلا تمام شد — {dollar} در برابر {gold}.",
+      verdictTie: "مساوی: هر دو پای به همان ارزش رسیدند.",
+      liveEndNote: "ارزیابی‌شده به قیمت‌های زندهٔ امروز",
+      historyEndNote: "ارزیابی‌شده به قیمت‌های آخرین سالِ کامل",
+      chartAria:
+        "مبلغِ واردشده چه شد، سال‌به‌سال: مسیر طلا و مسیر دلار، هر دو به تومان، مقیاس لگاریتمی.",
+      chartGold: "طلا",
+      chartDollar: "دلار",
+      scaleLog: "مقیاس لگاریتمی",
+      scaleLinear: "خطی",
+      methodOpenLabel: "چگونه محاسبه می‌شود",
+      methodLine:
+        "مبلغ، گرم طلای ۱۸ عیار و دلار آمریکا را به قیمتِ خودِ سالِ شروع در تهران می‌خرد — گرم طلا به قیمت پایان همان سال (پیش از ۱۳۹۲ برآورد برابری، از ۱۳۹۲ قیمت بازار تهران) و دلار به نرخ آزاد همان سال (پیش از ۱۳۹۰ جدول تاریخیِ استنادشده، از ۱۳۹۰ ارقام واقعی TGJU). بعد هر دو پای به قیمت امروز ارزیابی می‌شوند: گرم زندهٔ geram18 و دلارِ آزادِ زنده هر وقت برسند، وگرنه آخرین سالِ کامل — در همان‌جا نام‌گذاری می‌شود. حکم، نسبتِ صادقانهٔ دو ارزشِ نهایی است، هر دو به تومان. بازدهٔ گذشته تضمینِ آینده نیست؛ این توصیف است، نه توصیه.",
+      sourceNote: "همان داده‌های مسابقهٔ ۴۷ سالهٔ بالا: جدول تاریخیِ دلار آزاد و ردیف‌های روزانهٔ price_dollar_rl و geram18 از TGJU.",
+      unavailable: "این بخش هنوز خوانده نشد؛ به‌جای حدس، هیچ‌چیز نشان داده نمی‌شود.",
+      pendingLine: "در حال خواندن سری…",
+      yearNoAnswer: "این سال هنوز پاسخ ندارد — قیمت‌هایش در حال خوانده‌شدن است.",
     },
     longview: {
       eyebrow: "منظر بلند",
@@ -1613,6 +1705,8 @@ export const UI = {
       title: "ماشین حساب طلا",
       subtitle:
         "همهٔ «اگر»ها در یک جا: بازدهی هر پنجره، ماشین‌حساب ثروتِ دو حالته (یک‌جا بخر یا هر ماه بخر — به دلار، ارز دیگر، تومان یا گرم طلا)، مقایسهٔ دارایی‌ها — و مترِ هر روزِ گذشته، پشت یک لمس.",
+      subtitleNoToman:
+        "همهٔ «اگر»ها در یک جا: بازدهی هر پنجره، ماشین‌حساب ثروتِ دو حالته (یک‌جا بخر یا هر ماه بخر — به دلار، ارز دیگر یا گرم طلا)، مقایسهٔ دارایی‌ها — و مترِ هر روزِ گذشته، پشت یک لمس.",
       advancedLabel: "باز کردن ماشین زمان · هر روزِ گذشته",
       modeOne: "خرید یک‌جا",
       modeDca: "خرید هر ماه",

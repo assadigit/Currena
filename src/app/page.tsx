@@ -86,6 +86,7 @@ import {
 } from "@/components/gold-page/context-cards";
 import { BridgeBoard, fetchRates, type RatesPayload } from "@/components/gold-page/bridge-board";
 import { DollarTrendBand, fetchDollarTrend } from "@/components/gold-page/dollar-trend";
+import { RaceYieldBand } from "@/components/gold-page/race-yield";
 import { LongViewCard } from "@/components/gold-page/longview";
 import { CoinBuyerBand } from "@/components/gold-page/coin-buyer";
 import { WgcCard } from "@/components/gold-page/wgc-card";
@@ -207,15 +208,24 @@ const NAV_SECTIONS: ReadonlyArray<{ id: string; key: keyof typeof UI.en.nav | nu
   { id: "gold-dashboard", key: null, label: ["Dashboard", "داشبورد"] },
   { id: "gold-bridge", key: null, label: ["Iran", "ایران"] },
   { id: "gold-dollar-trend", key: null, label: ["Gold vs USD", "طلا و دلار"] },
+  { id: "gold-race-yield", key: null, label: ["Gold or USD?", "طلا یا دلار؟"] },
   { id: "gold-calculator", key: null, label: ["Calculator", "ماشین حساب"] },
   { id: "gold-relationships", key: null, label: ["Map", "نقشه"] },
   { id: "gold-history", key: null, label: ["History", "تاریخ"] },
 ];
 
-function SectionNav({ locale }: { locale: Locale }) {
+function SectionNav({ locale, showIran }: { locale: Locale; showIran: boolean }) {
   const [active, setActive] = React.useState<string | null>(null);
+  /* the chip set itself follows the resolved visibility — Iran's own
+     chips (the bridge, the race, the yield question) ride only when the
+     layer shows (the owner's 2026-11-27 ask: the international reader
+     never meets them) */
+  const sections = React.useMemo(
+    () => NAV_SECTIONS.filter((s) => showIran || (s.id !== "gold-bridge" && s.id !== "gold-dollar-trend" && s.id !== "gold-race-yield")),
+    [showIran],
+  );
   React.useEffect(() => {
-    const targets = NAV_SECTIONS.map((s) => document.getElementById(s.id)).filter((el): el is HTMLElement => el !== null);
+    const targets = sections.map((s) => document.getElementById(s.id)).filter((el): el is HTMLElement => el !== null);
     const obs = new IntersectionObserver(
       (entries) => {
         const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
@@ -225,14 +235,14 @@ function SectionNav({ locale }: { locale: Locale }) {
     );
     targets.forEach((el) => obs.observe(el));
     return () => obs.disconnect();
-  }, [locale]);
+  }, [locale, sections]);
   return (
     <nav
       aria-label={locale === "en" ? "Sections" : "بخش‌ها"}
       className="chip-scroller sticky top-16 z-30 mt-2 border-y border-[var(--color-border)] bg-[var(--color-currena-bg-light)]/92 px-3 backdrop-blur sm:px-6 lg:top-20"
     >
       <div className="mx-auto flex w-full max-w-[1080px] gap-1.5 overflow-x-auto py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {NAV_SECTIONS.map((s) => (
+        {sections.map((s) => (
           <a
             key={s.id}
             href={`#${s.id}`}
@@ -1231,7 +1241,7 @@ function BridgeBand({ t, locale, premium, fmt, rates }: { t: typeof UI.en; local
  * The history tail — episodes + the if-you'd-bought calculator
  * ------------------------------------------------------------------ */
 
-function HistoryBand({ data, t, fmt, locale }: { data: GoldPayload; t: typeof UI.en; fmt: ReturnType<typeof makeFmt>; locale: Locale }) {
+function HistoryBand({ data, t, fmt, locale, showIran }: { data: GoldPayload; t: typeof UI.en; fmt: ReturnType<typeof makeFmt>; locale: Locale; showIran: boolean }) {
   /* the big episodes + the if-you'd-bought chart, collapsed by default —
      one tap opens the era record, the daily read stays light */
   const [open, setOpen] = React.useState(false);
@@ -1257,7 +1267,7 @@ function HistoryBand({ data, t, fmt, locale }: { data: GoldPayload; t: typeof UI
           machine, and the 20-year table behind its modal: the historical
           perspective itself, always visible (the episodes below it stay
           behind the tap) */}
-      <LongViewCard liveSpot={data.gold.spot} t={t.longview} locale={locale} fmt={fmt} />
+      <LongViewCard liveSpot={data.gold.spot} t={t.longview} locale={locale} fmt={fmt} showIran={showIran} />
 
       {open ? (
       <div className="mt-2.5 grid grid-cols-1 gap-2.5 lg:grid-cols-2">
@@ -1321,6 +1331,27 @@ export default function GoldPage() {
       /* private mode — the toggle still works for the session */
     }
   }, [locale]);
+  /* Iran's own layer (the owner's 2026-11-27 ask): the international
+     reader does not need the Tehran board, the toman, or the race —
+     hidden in EN by DEFAULT, shown on the toggle; the Persian reader
+     always sees it (it is their market). Persisted beside the locale,
+     the same law (SSR renders the default first, the stored pick
+     applies right after mount). */
+  const [iranToggle, setIranToggle] = React.useState<boolean>(false);
+  React.useEffect(() => {
+    const saved = window.localStorage.getItem("currena-gold-iran");
+    if (saved === "on") setIranToggle(true);
+  }, []);
+  React.useEffect(() => {
+    try {
+      window.localStorage.setItem("currena-gold-iran", iranToggle ? "on" : "off");
+    } catch {
+      /* private mode — the toggle still works for the session */
+    }
+  }, [iranToggle]);
+  /* the resolved visibility: fa always shows the layer (it is the
+     Persian reader's own market); EN rides the toggle */
+  const showIran = locale === "fa" || iranToggle;
   const t = UI[locale] as typeof UI.en;
   const fmt = React.useMemo(() => makeFmt(locale), [locale]);
   const balance = React.useMemo(() => balanceOf(), []);
@@ -1343,7 +1374,10 @@ export default function GoldPage() {
   });
   const cb = useQuery({ queryKey: ["currena-gold-cb"], queryFn: fetchCb, retry: 1 });
   const lbma = useQuery({ queryKey: ["currena-gold-lbma"], queryFn: fetchLbma, retry: 1 });
-  const premium = useQuery({ queryKey: ["currena-gold-premium"], queryFn: fetchPremium, retry: 1 });
+  /* Iran's own data legs — gated by the resolved visibility (the
+     owner's 2026-11-27 ask): the queries never fire for the EN reader
+     with the layer hidden; fa (or the toggle) wakes them. */
+  const premium = useQuery({ queryKey: ["currena-gold-premium"], queryFn: fetchPremium, retry: 1, enabled: showIran });
   const positions = useQuery({ queryKey: ["currena-gold-positions"], queryFn: fetchPositions, retry: 1 });
   const correlation = useQuery({ queryKey: ["currena-gold-correlation"], queryFn: fetchCorrelation, retry: 1 });
   const ifbought = useQuery({ queryKey: ["currena-gold-ifbought"], queryFn: fetchIfBought, retry: 1 });
@@ -1352,16 +1386,19 @@ export default function GoldPage() {
      live Tehran rates (the bridge board); all fail-closed. */
   const projection = useQuery({ queryKey: ["currena-gold-projection"], queryFn: fetchProjection, retry: 1 });
   const crosses = useQuery({ queryKey: ["currena-gold-crosses"], queryFn: fetchCrosses, retry: 1 });
-  const rates = useQuery({ queryKey: ["currena-gold-rates"], queryFn: fetchRates, retry: 1 });
+  const rates = useQuery({ queryKey: ["currena-gold-rates"], queryFn: fetchRates, retry: 1, enabled: showIran });
   /* the dollar-vs-gold trend — «روند نرخ طلا در برابر دلار», the 47-year
      Iran race (the cited static layer + the TGJU evergreen legs); the
      static layer always serves, so the band renders through its own
-     honest states even before the live legs arrive */
+     honest states even before the live legs arrive. Gated by the
+     resolved visibility — the race-yield section and the longview toman
+     machine ride the SAME query, so they wake it too when visible. */
   const dollarTrend = useQuery({
     queryKey: ["currena-gold-dollar-trend"],
     queryFn: fetchDollarTrend,
     staleTime: 5 * 60 * 1000,
     retry: 1,
+    enabled: showIran,
   });
 
   /* THE Market Brief's own price-position line (the owner's ask: the
@@ -1401,13 +1438,15 @@ export default function GoldPage() {
   }, [data, ta.data, trends.data, t, fmt, locale]);
 
   /* the Iranian-toman gold cross — the live free-market dollar (the
-     Tehran snapshot) × the global ounce; rides the currency grid */
+     Tehran snapshot) × the global ounce; rides the currency grid. Null
+     when Iran's layer is hidden (the grid row renders only when
+     non-null — the owner's 2026-11-27 ask). */
   const tomanPerOunce = React.useMemo(() => {
-    if (!data) return null;
+    if (!data || !showIran) return null;
     const usd = rates.data?.rates?.find((r) => r.code === "USD");
     const perUsd = dollarTomanOf(usd?.rate);
     return perUsd !== null && Number.isFinite(perUsd) ? perUsd * data.gold.spot : null;
-  }, [data, rates.data]);
+  }, [data, rates.data, showIran]);
 
   React.useEffect(() => {
     document.documentElement.lang = locale;
@@ -1418,7 +1457,7 @@ export default function GoldPage() {
     <div dir={t.dir} lang={locale} className="flex min-h-screen flex-col bg-[var(--color-currena-bg-light)]">
       <span id="top" />
       <Header locale={locale} onToggleLang={() => setLocale((l) => (l === "en" ? "fa" : "en"))} />
-      <SectionNav locale={locale} />
+      <SectionNav locale={locale} showIran={showIran} />
 
       <main id="main-content" className="mx-auto w-full max-w-[560px] flex-1 px-3 py-4 sm:max-w-[680px] sm:px-6 sm:py-5 lg:max-w-[1080px] lg:px-8">
         {/* the heading block */}
@@ -1446,6 +1485,30 @@ export default function GoldPage() {
           <p className="m-0 mt-1.5 flex flex-wrap items-baseline gap-x-2.5 type-caption font-semibold text-[var(--color-text-tertiary)]">
             {t.dataAsOf.replace("{date}", data ? fmt.dateWords(data.asOf) : "·")}
           </p>
+
+          {/* Iran's own layer — the EN reader's toggle (the owner's
+              2026-11-27 ask: the international reader does not need the
+              Tehran board, the toman, or the race; hidden by default,
+              one tap wakes the whole layer). The fa reader always sees
+              the layer — their market — so the control never shows. */}
+          {locale === "en" ? (
+            <div className="mt-2.5 flex flex-wrap items-center gap-x-2 gap-y-1" data-iran-toggle-row>
+              <button
+                type="button"
+                aria-pressed={iranToggle}
+                onClick={() => setIranToggle((v) => !v)}
+                className={`inline-flex min-h-[36px] items-center gap-1.5 rounded-full px-3.5 py-1 text-[12.5px] font-bold transition-transform hover:scale-[1.02] active:scale-95 ${
+                  iranToggle
+                    ? "bg-[var(--color-bridge-accent)] text-white"
+                    : "bg-[var(--color-surface)] text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)] hover:text-[var(--color-text-primary)]"
+                }`}
+                data-iran-toggle
+              >
+                {iranToggle ? t.iranToggle.shownLabel : t.iranToggle.label}
+              </button>
+              <span className="type-caption text-[var(--color-text-tertiary)]">{t.iranToggle.note}</span>
+            </div>
+          ) : null}
         </header>
 
         {isLoading ? (
@@ -1480,7 +1543,7 @@ export default function GoldPage() {
                   in an LTR block, the fresh Persian under the honest
                   «ترجمهٔ ماشینی» label, the waiting/fetch-failed/alert
                   states riding the same card */}
-              <TeCard t={t.te} locale={locale} fmt={fmt} />
+              <TeCard t={t.te} locale={locale} fmt={fmt} showIran={showIran} />
               {/* the WGC monthly commentary — the World Gold Council's own
                   monthly one-glance under the daily pair: the
                   Highlights box verbatim in an LTR block, the honest
@@ -1519,21 +1582,35 @@ export default function GoldPage() {
               tomanPerOunce={tomanPerOunce}
             />
 
-            {/* the Iran bridge — now with the live Tehran board + the premium history */}
-            <BridgeBand t={t} locale={locale} premium={premium.data ?? null} fmt={fmt} rates={rates.data ?? null} />
+            {/* Iran's own stack (the owner's 2026-11-27 ask): the bridge,
+                the 47-year race, and the yield question — one layer,
+                shown to the Persian reader always, to the EN reader on
+                the toggle (the international reader does not need it) */}
+            {showIran ? (
+              <>
+                {/* the Iran bridge — now with the live Tehran board + the premium history */}
+                <BridgeBand t={t} locale={locale} premium={premium.data ?? null} fmt={fmt} rates={rates.data ?? null} />
 
-            {/* the dollar-vs-gold trend — «روند نرخ طلا در برابر دلار»:
-                the 47-year race, immediately after the bridge (the
-                reader who just learned the حباب decomposition gets its
-                long payoff), before the calculator */}
-            <DollarTrendBand
-              t={t.dollarTrend}
-              locale={locale}
-              fmt={fmt}
-              data={dollarTrend.data ?? null}
-              pending={dollarTrend.isLoading}
-              rates={rates.data ?? null}
-            />
+                {/* the dollar-vs-gold trend — «روند نرخ طلا در برابر دلار»:
+                    the 47-year race, immediately after the bridge (the
+                    reader who just learned the حباب decomposition gets its
+                    long payoff), before the yield question */}
+                <DollarTrendBand
+                  t={t.dollarTrend}
+                  locale={locale}
+                  fmt={fmt}
+                  data={dollarTrend.data ?? null}
+                  pending={dollarTrend.isLoading}
+                  rates={rates.data ?? null}
+                />
+
+                {/* the Iran yield question — «طلا یا دلار؟» (the owner's
+                    2026-11-27 ask): a sum of toman, any year since ۱۳۵۷,
+                    gold vs the free-market dollar, both marked at today's
+                    prices; rides the SAME dollar-trend payload above */}
+                <RaceYieldBand t={t.raceYield} locale={locale} fmt={fmt} />
+              </>
+            ) : null}
 
             {/* the calculator — ONE tool at the page's foot: the what-if
                 windows, the wealth calculator, the assets head-to-head,
@@ -1543,6 +1620,7 @@ export default function GoldPage() {
               ib={t.ifBought}
               calc={t.calculator}
               locale={locale}
+              showIran={showIran}
               windowNames={t.price.windowNames}
               verdictWords={{ verdictFor: t.balance.verdictFor, verdictAgainst: t.balance.verdictAgainst, verdictBalanced: t.balance.verdictBalanced, verdictNone: t.balance.verdictNoneWord }}
               fmt={fmt}
@@ -1566,7 +1644,7 @@ export default function GoldPage() {
 
             {/* the history — the most important events of gold's history,
                 the page's very last section (the owner's ask) */}
-            <HistoryBand data={data} t={t} fmt={fmt} locale={locale} />
+            <HistoryBand data={data} t={t} fmt={fmt} locale={locale} showIran={showIran} />
           </>
         )}
       </main>

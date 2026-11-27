@@ -101,6 +101,8 @@ export interface TeCardCopy {
   /** The single stamp when published and fetched are the same day (batch L). */
   updatedLabel: string;
   stateWaiting: string;
+  /** The Iran-hidden variant (EN's own): no Tehran wall-clock pair. */
+  stateWaitingNoTehran?: string;
   stateFetchFailed: string;
   stateAlert: string;
   unavailable: string;
@@ -140,10 +142,14 @@ export function TeCard({
   t,
   locale,
   fmt,
+  showIran,
 }: {
   t: TeCardCopy;
   locale: Locale;
   fmt: Fmt;
+  /** False when the EN reader has Iran's layer hidden (the owner's
+   *  2026-11-27 ask) — the waiting line drops its Tehran wall-clock. */
+  showIran: boolean;
 }) {
   const q = useQuery({
     queryKey: ["currena-gold-te"],
@@ -222,7 +228,7 @@ export function TeCard({
       ) : null}
       {d?.status === "waiting" ? (
         <p className="m-0 mt-2.5 rounded-[var(--cr-radius-md)] bg-[var(--color-currena-soft)] px-3 py-2 type-caption leading-relaxed text-[var(--color-text-secondary)] ring-1 ring-[var(--color-border)]">
-          {t.stateWaiting.replace("{time}", nextFire ?? "05:00 / 16:00 UTC")}
+          {(showIran || t.stateWaitingNoTehran === undefined ? t.stateWaiting : t.stateWaitingNoTehran).replace("{time}", nextFire ?? "05:00 / 16:00 UTC")}
         </p>
       ) : null}
       {fetchFailed ? (
