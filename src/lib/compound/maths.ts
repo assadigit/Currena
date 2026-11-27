@@ -99,6 +99,65 @@ export const FEE_WARNING_SHARE = 0.01;
 export const APPLY_COST_TO_CASH = false;
 
 /* =================================================================== *
+ * The spending receipt (v10, spec §6.7)                                 *
+ * =================================================================== */
+
+/** A receipt item's cadence: how often the cost repeats. */
+export type Cadence = "daily" | "weekly" | "monthly" | "yearly";
+
+/** How each cadence turns into a monthly amount (spec §6.7): a daily
+ *  cost happens 365/12 times a month, a weekly one 52/12 times, a
+ *  monthly one once, a yearly one 1/12 times. So daily 3 → 91.25
+ *  exactly and yearly 120 → 10 exactly. */
+export const CADENCE_FACTORS: Record<Cadence, number> = {
+  daily: 365 / 12,
+  weekly: 52 / 12,
+  monthly: 1,
+  yearly: 1 / 12,
+};
+
+/** The receipt's horizon chips (years): 3 matches the owner's example,
+ *  10 (the default) gives compounding room to speak. */
+export const RECEIPT_HORIZONS: readonly number[] = [3, 5, 10];
+/** The receipt's default horizon (years). */
+export const RECEIPT_HORIZON_DEFAULT = 10;
+
+/** The three example items the receipt starts with (answer-on-arrival):
+ *  illustrative stand-in prices for well-known subscriptions, clearly
+ *  labelled — NOT figures-file data (spec §7 governs market figures
+ *  only; these are example prices, not sourced market numbers). */
+export const RECEIPT_EXAMPLES: ReadonlyArray<{
+  label: string;
+  labelFa: string;
+  amount: number;
+  cadence: Cadence;
+}> = [
+  { label: "YouTube Premium", labelFa: "یوتیوب پرمیوم", amount: 13.99, cadence: "monthly" },
+  { label: "Spotify", labelFa: "اسپاتیفای", amount: 10.99, cadence: "monthly" },
+  { label: "iCloud+ 2TB", labelFa: "آیکلاود ۲ ترابایت", amount: 9.99, cadence: "monthly" },
+];
+
+/** An item's label is optional and at most this many characters. */
+export const RECEIPT_LABEL_MAX = 28;
+/** An item's price is more than 0 and at most this (two decimals). */
+export const RECEIPT_AMOUNT_MAX = 999_999;
+
+/** The paper card's fixed light palette (v10 spec §5) — a receipt is
+ *  paper, so the card keeps its own light colours in BOTH themes (the
+ *  A4 card's ink-safe precedent). Every text pair is AA on the paper
+ *  ground: ink 12.7:1, muted 5.6:1 (measured). */
+export const RECEIPT_PALETTE = {
+  /** The paper ground. */
+  paper: "#fffdf6",
+  /** The main ink (labels, amounts, the sentence). */
+  ink: "#26333d",
+  /** The secondary ink (hints, the assumption line, the thanks). */
+  muted: "#5a6873",
+  /** The dotted leaders and the dashed rules. */
+  rule: "#aeb8c0",
+} as const;
+
+/* =================================================================== *
  * Types                                                               *
  * =================================================================== */
 
@@ -669,6 +728,47 @@ export function shareRounded(share: number): { pct: number; underOne: boolean } 
     pct: Math.round(clamped * 100),
     underOne: clamped > 0 && clamped < SHARE_BAR_MIN_SHOWN,
   };
+}
+
+/* =================================================================== *
+ * The spending receipt maths (v10, spec §6.7)                          *
+ * =================================================================== */
+
+/** Normalize one item to its monthly amount (spec §6.7), full precision
+ *  inside: daily × 365/12, weekly × 52/12, monthly × 1, yearly × 1/12.
+ *  So daily 3 → 91.25 exactly, weekly 10 → 43.33…, yearly 120 → 10
+ *  exactly, monthly 50 → 50. Display rounds to the cent; this does not. */
+export function normalizeToMonthly(amount: number, cadence: Cadence): number {
+  if (!Number.isFinite(amount)) return 0;
+  return amount * CADENCE_FACTORS[cadence];
+}
+
+/** The receipt's invested-instead projection (spec §6.7): the SAME
+ *  engine at the page's current plan assumptions, on the leak money —
+ *  base = the combined monthly total (never salary mode, so the salary
+ *  never appears), starting amount 0, yearly increase 0, and the plan's
+ *  own yearly cost, purchase fee, purchase frequency, rate mode, custom
+ *  rates and inflation. One rule: "your plan's own assumptions, on your
+ *  leak money." No engine behaviour changes — a thin pure wrapper. */
+export function receiptProjection(
+  plan: PlanInput,
+  monthlyTotal: number,
+  years: number,
+  figures: AssetFigures,
+): CompoundResult {
+  return computeCompound(
+    {
+      ...plan,
+      monthly: monthlyTotal,
+      salary: null,
+      share: 0,
+      useShare: false,
+      startingAmount: 0,
+      yearlyIncrease: 0,
+    },
+    figures,
+    Math.max(0, Math.round(years * 12)),
+  );
 }
 
 /* =================================================================== *

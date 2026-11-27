@@ -178,6 +178,48 @@ export interface CompoundCopy {
         costs: string;
       };
     };
+    /** v10: the spending receipt — the itemised leak, the combined
+     *  total, and one invested-instead projection on the plan's own
+     *  assumptions. Store-nothing: reload resets to the examples. */
+    receipt: {
+      /** The section's own name (never plain "Receipt" — the
+       *  exchange-receipt tool already owns that word). */
+      heading: string;
+      lede: string;
+      /** The one-line hint under the three example items. */
+      hint: string;
+      /** The add form's labels. */
+      formLabel: string; // "What is it?"
+      priceLabel: string; // "Price"
+      cadenceLabel: string; // "How often"
+      addLabel: string; // "Add"
+      /** The four cadences, in select order. */
+      cadences: { daily: string; weekly: string; monthly: string; yearly: string };
+      /** The default label for an unnamed item ("Item 3"). */
+      defaultItemLabel: string; // "Item {n}"
+      /** The totals block. */
+      totalMonthly: string; // "Total per month"
+      totalYearly: string; // "Total per year"
+      /** The projection block. */
+      projectionTitle: string; // "If you invested it instead"
+      horizonLabel: string; // the chips' group label
+      projectionSentence: string; // "Investing {amount} a month for {years} years: about {final} (about {today} in today's money)."
+      fromLine: string; // "You put in {putIn} · growth added {growth}."
+      assumption: string; // "At your plan's own asset and costs above ({asset})."
+      barSr: string; // the split bar's aria-label sentence
+      zinger: string;
+      thanks: string; // "Thank you for shopping!"
+      emptyHint: string;
+      clearAll: string; // "Clear all"
+      clearConfirm: string; // "Sure? Clear all"
+      removeAria: string; // "Remove {item}, {price} {cadence}"
+      announceAdd: string; // "Added {item}. Total {total} a month."
+      announceRemove: string; // "Removed {item}. Total {total} a month."
+      announceClear: string; // "Cleared. {hint}"
+      /** The sr-only mirror of the whole paper (the v6 chart-summary
+       *  pattern): items, totals and projection in one paragraph. */
+      srSummary: string;
+    };
     moreOptions: {
       title: string;
       aboutYou: string;
@@ -438,6 +480,36 @@ export const COPY: Record<Locale, CompoundCopy> = {
           costs: "Two bars on one scale: the after-costs bar is the shorter one.",
         },
       },
+      receipt: {
+        heading: "The spending receipt",
+        lede: "Add the subscriptions and small costs you pay for on autopilot. See what they add up to — and what that money could have been.",
+        hint: "These three are examples — remove them and add your own.",
+        formLabel: "What is it?",
+        priceLabel: "Price",
+        cadenceLabel: "How often",
+        addLabel: "Add",
+        cadences: { daily: "Daily", weekly: "Weekly", monthly: "Monthly", yearly: "Yearly" },
+        defaultItemLabel: "Item {n}",
+        totalMonthly: "Total per month",
+        totalYearly: "Total per year",
+        projectionTitle: "If you invested it instead",
+        horizonLabel: "For how many years",
+        projectionSentence: "Investing {amount} a month for {years} years: about {final} (about {today} in today's money).",
+        fromLine: "You put in {putIn} · growth added {growth}.",
+        assumption: "At your plan's own asset and costs above ({asset}).",
+        barSr: "Of the final amount, {put} is money you put in and {growth} is growth.",
+        zinger: "Every renewal is a withdrawal from your future self.",
+        thanks: "Thank you for shopping!",
+        emptyHint: "Add a cost to see what it could become.",
+        clearAll: "Clear all",
+        clearConfirm: "Sure? Clear all",
+        removeAria: "Remove {item}, {price} {cadence}",
+        announceAdd: "Added {item}. Total {total} a month.",
+        announceRemove: "Removed {item}. Total {total} a month.",
+        announceClear: "Cleared. {hint}",
+        srSummary:
+          "Receipt: {n} costs, {monthly} a month, {yearly} a year. Invested instead at your plan's rate for {years} years: about {final} — {putIn} from you, {growth} from growth.",
+      },
       moreOptions: {
         title: "More options",
         aboutYou: "About you",
@@ -696,6 +768,36 @@ export const COPY: Record<Locale, CompoundCopy> = {
           cash: "دو میله در یک مقیاس: همان پول، سرمایه‌گذاری‌شده یا نقد نگه‌داشته‌شده.",
           costs: "دو میله در یک مقیاس: میلهٔ پس از هزینه‌ها کوتاه‌تر است.",
         },
+      },
+      receipt: {
+        heading: "رسید خرج‌های شما",
+        lede: "اشتراک‌ها و هزینه‌های خردی که خودکار تمدید می‌شوند را اضافه کنید؛ جمعشان را ببینید — و اینکه به‌جایش می‌توانست چه باشد.",
+        hint: "این‌ها نمونه‌اند — حذفشان کنید و هزینه‌های خودتان را اضافه کنید.",
+        formLabel: "چه هزینه‌ای؟",
+        priceLabel: "قیمت",
+        cadenceLabel: "دوره",
+        addLabel: "اضافه کردن",
+        cadences: { daily: "روزانه", weekly: "هفتگی", monthly: "ماهانه", yearly: "سالانه" },
+        defaultItemLabel: "مورد {n}",
+        totalMonthly: "جمع ماهانه",
+        totalYearly: "جمع سالانه",
+        projectionTitle: "اگر به‌جایش سرمایه‌گذاری می‌کردید",
+        horizonLabel: "برای چند سال",
+        projectionSentence: "سرمایه‌گذاری {amount} در ماه، برای {years} سال: حدود {final} (حدود {today} به پول امروز).",
+        fromLine: "واردشده {putIn} · رشدِ افزوده {growth}.",
+        assumption: "با همان دارایی و هزینه‌های برنامهٔ بالا ({asset}).",
+        barSr: "از مبلغ نهایی، {put} پول خودتان است و {growth} رشد.",
+        zinger: "هر تمدید اشتراک، برداشتی از آیندهٔ خودتان است.",
+        thanks: "از خرید شما سپاسگزاریم!",
+        emptyHint: "یک هزینه اضافه کنید تا ببینید پولش می‌توانست چه شود.",
+        clearAll: "پاک کردن همه",
+        clearConfirm: "مطمئنید؟ پاک شود",
+        removeAria: "حذف {item}، {price} {cadence}",
+        announceAdd: "{item} اضافه شد. جمع ماهانه {total}.",
+        announceRemove: "{item} حذف شد. جمع ماهانه {total}.",
+        announceClear: "پاک شد. {hint}",
+        srSummary:
+          "رسید: {n} هزینه، {monthly} در ماه، {yearly} در سال. اگر به‌جایش با بازدهٔ برنامهٔ شما برای {years} سال سرمایه‌گذاری می‌شد: حدود {final} — {putIn} از خودتان و {growth} از رشد.",
       },
       moreOptions: {
         title: "گزینه‌های بیشتر",

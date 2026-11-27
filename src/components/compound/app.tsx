@@ -75,6 +75,7 @@ import { ToolsBreadcrumb, ToolsFooter, ToolsHeader, useSiteLocale } from "@/comp
 import { GrowthChart, DASHES, type ChartVisible, type OtherLine } from "@/components/compound/chart";
 import { A4PrintCard, PhoneCard } from "@/components/compound/cards";
 import { MiniBars, ShareBar, type MiniBarRow } from "@/components/compound/bars";
+import { SpendingReceipt } from "@/components/compound/receipt";
 
 /* =================================================================== *
  * Small helpers                                                       *
@@ -1446,6 +1447,28 @@ export default function CompoundWealthApp({ ssrStartMonth }: { ssrStartMonth?: s
               </div>
             ) : null}
           </div>
+        </section>
+
+        {/* v10 — the spending receipt: the itemised leak, the combined
+            total, and one invested-instead projection at the plan's own
+            assumptions. Below the fold; no controls added to the default
+            screen; nothing stored. */}
+        <section className="mt-5" aria-label={t.receipt.heading} id="spending-receipt" data-cw="receipt-section">
+          <h2 className="type-kicker mb-2 text-[var(--color-text-tertiary)]">{t.receipt.heading}</h2>
+          <p className="mb-2 text-[13px] leading-relaxed text-[var(--color-text-secondary)]">{t.receipt.lede}</p>
+          <SpendingReceipt
+            locale={locale}
+            copy={t.receipt}
+            plan={plan}
+            figures={figures}
+            assetLabel={locale === "fa" ? asset.labelFa : asset.labelEn}
+            currencySymbol={currencySymbol}
+            currencyWord={currencyWord}
+            neverInvests={t.whatIf.neverInvests}
+            clampMessage={t.errors.clampMessage}
+            underOne={t.shareBar.underOne}
+            barLabels={{ putIn: t.chart.putInLabel, growth: t.chart.growthLabel }}
+          />
         </section>
 
         {/* More options — four plain groups, all collapsed by default */}
