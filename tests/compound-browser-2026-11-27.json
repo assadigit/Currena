@@ -9,7 +9,7 @@
     {
       "id": "13-exact-controls",
       "pass": true,
-      "detail": "38 interactive elements, all spec'd"
+      "detail": "49 interactive elements, all spec'd"
     },
     {
       "id": "13b-salary-hidden-in-amount-mode",
@@ -29,7 +29,7 @@
     {
       "id": "15-two-tap-rule",
       "pass": true,
-      "detail": "3 one-tap changes in 239ms"
+      "detail": "3 one-tap changes in 264ms"
     },
     {
       "id": "16-groups-collapsed",
@@ -431,6 +431,106 @@
       "detail": "paths 11, comparison labels [\"S&P 500\",\"Gold\",\"World shares\",\"Cash\"]"
     },
     {
+      "id": "v10-1-examples-on-arrival",
+      "pass": true,
+      "detail": "items [\"YouTube Premium\",\"Spotify\",\"iCloud+ 2TB\"], monthly Total per monthA$34.97, sentence Investing A$34.97 a month for 10 years: about A$6,000 (about A$4,600 in today's money)."
+    },
+    {
+      "id": "v10-2-add-updates-all",
+      "pass": true,
+      "detail": "{\"monthly\":\"Total per monthA$50.95\",\"live\":\"Added Netflix. Total A$50.95 a month.\",\"sentence\":\"Investing A$50.95 a month for 10 years: about A$8,700 (about\"}"
+    },
+    {
+      "id": "v10-5-cadence-normalization",
+      "pass": true,
+      "detail": "monthly Total per monthA$60.95, cadence kept yearly, line Domain nameA$120.00Yearly×"
+    },
+    {
+      "id": "v10-3-remove",
+      "pass": true,
+      "detail": "monthly Total per monthA$49.96, live Removed Spotify. Total A$49.96 a month."
+    },
+    {
+      "id": "v10-7-projection-matches-reference",
+      "pass": true,
+      "detail": "measured 7.2% → reference about A$8,500; page says Investing A$49.96 a month for 10 years: about A$8,500 (about A$6,500 in today's money)."
+    },
+    {
+      "id": "v10-8-label-in-name",
+      "pass": true,
+      "detail": "Remove YouTube Premium, A$13.99 Monthly | Remove iCloud+ 2TB, A$9.99 Monthly | Remove Netflix, A$15.98 Monthly | Remove Domain name, A$120.0"
+    },
+    {
+      "id": "v10-9-keyboard-only",
+      "pass": true,
+      "detail": "kb add Total per monthA$104.96, clear label \"Sure? Clear all\", after: 0 items, focus receipt-add"
+    },
+    {
+      "id": "v10-4-clear-two-step",
+      "pass": true,
+      "detail": "armed \"Sure? Clear all\" (1 item), after 4.3s \"Clear all\" (1 item), re-arm, cleared → 0 items"
+    },
+    {
+      "id": "v10-6-clamp-message",
+      "pass": true,
+      "detail": "empty → note \"That number is outside the allowed range, so we kept the nearest one.\", count 0; huge → \"EverythingA$999,999.00Monthly×\", monthly Total per monthA$999,999.00"
+    },
+    {
+      "id": "v10-10-sr-summary-mirrors",
+      "pass": true,
+      "detail": "\"Receipt: 1 costs, A$999,999.00 a month, A$11,999,988.00 a year. Invested instead at your plan's rate for 10 years: about A$171,050,000 — A$120,000,000\""
+    },
+    {
+      "id": "v10-11-reload-restores-examples",
+      "pass": true,
+      "detail": "3 items, monthly Total per monthA$34.97, hint back"
+    },
+    {
+      "id": "v10-12-default-screen-untouched",
+      "pass": true,
+      "detail": "receipt controls [\"receipt-add\",\"receipt-cadence\",\"receipt-clear\",\"receipt-horizon-10\",\"receipt-horizon-3\",\"receipt-horizon-5\",\"receipt-price\",\"receipt-remove\",\"receipt-remove\",\"receipt-remove\",\"receipt-what\"], one-screen true/true/true"
+    },
+    {
+      "id": "v10-13-follows-asset",
+      "pass": true,
+      "detail": "assumption \"At your plan's own asset and costs above (Gold).\", sentence Investing A$34.97 a month for 10 years: about A$6,500 (about A$4,900 in today's money"
+    },
+    {
+      "id": "v10-14-follows-costs",
+      "pass": true,
+      "detail": "3% cost → Investing A$34.97 a month for 10 years: about A$5,200 (about A$3,900 i | 0.2% → Investing A$34.97 a month for 10 years: about A$6,000 (about A$4,600 i"
+    },
+    {
+      "id": "v10-15-honest-edge-bar-hidden",
+      "pass": true,
+      "detail": "bar 0, sentence kept: Investing A$34.97 a month for 10 years: about A$4,200 (about A$3,200 in today's "
+    },
+    {
+      "id": "v10-16-never-invests",
+      "pass": true,
+      "detail": "\"With these numbers, the cost eats every purchase, so nothing\", sentence gone: true, sr carries it"
+    },
+    {
+      "id": "v10-17-fa-rtl",
+      "pass": true,
+      "detail": "dir rtl, monthly جمع ماهانه۳۴٫۹۷ دلار استرالیا, mirrored true, bar sr has ٪: true"
+    },
+    {
+      "id": "v10-18-360-wraps",
+      "pass": true,
+      "detail": "scrollW 360/360, label inside viewport: true"
+    },
+    {
+      "id": "v10-19-paper-aa-both-themes",
+      "pass": true,
+      "detail": "ink/muted ratios passed in light and dark: true/true"
+    },
+    {
+      "id": "v10-20-plain-language",
+      "pass": true,
+      "detail": "jargon [], avg 12 words over 7 sentences"
+    },
+    {
       "id": "19a-direct-load",
       "pass": true,
       "detail": "{\"/tools\":200,\"/tools/compound-wealth\":200,\"/tools/unknown\":404,\"/\":200}"
@@ -464,7 +564,7 @@
     }
   ],
   "summary": {
-    "total": 93,
+    "total": 113,
     "failed": 0
   }
 }

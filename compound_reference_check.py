@@ -174,6 +174,22 @@ def selftest():
     flag = "PASS" if abs(got_aud - 13.88) <= 0.05 else "FAIL"
     ok &= flag == "PASS"
     print(f"{flag}  {'AUD conversion 10% USD, FX 0.80 -> 0.40, 20y (spec test 7)':60s} expected ~13.88%  got {got_aud:.2f}%")
+
+    # v10 (spec test 49): the spending receipt — the two normalization
+    # equalities and the examples' 10-year invested-instead projection.
+    got_daily = 3 * 365 / 12
+    flag = "PASS" if got_daily == 91.25 else "FAIL"
+    ok &= flag == "PASS"
+    print(f"{flag}  {'Receipt daily 3 normalizes to 91.25 exactly (v10 test 49)':60s} expected  91.25  got {got_daily:>10,.2f}")
+    got_yearly = 120 * 1 / 12
+    flag = "PASS" if got_yearly == 10 else "FAIL"
+    ok &= flag == "PASS"
+    print(f"{flag}  {'Receipt yearly 120 normalizes to 10 exactly (v10 test 49)':60s} expected     10  got {got_yearly:>10,.2f}")
+    got_receipt = simulate(34.97, 7.2, 10, inflation_pct=2.77)["final"]
+    diff = abs(got_receipt - 5_982) / 5_982 * 100
+    flag = "PASS" if diff <= SELFTEST_TOLERANCE_PERCENT else "FAIL"
+    ok &= flag == "PASS"
+    print(f"{flag}  {'Receipt examples 34.97/mo, 10y, 7.2% - 0.2% (v10 test 49)':60s} expected ~ 5,982  got {got_receipt:>10,.1f}")
     return 0 if ok else 1
 
 

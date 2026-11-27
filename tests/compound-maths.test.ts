@@ -12,6 +12,9 @@ import {
   DEFAULT_YEARLY_COST,
   MILESTONES_ON_CARDS,
   MILESTONES_ON_PAGE,
+  RECEIPT_EXAMPLES,
+  RECEIPT_HORIZONS,
+  RECEIPT_HORIZON_DEFAULT,
   addMonths,
   audFromUsd,
   chooseRate,
@@ -23,6 +26,8 @@ import {
   monthlyAmountFrom,
   monthlySalaryFrom,
   monthsBetween,
+  normalizeToMonthly,
+  receiptProjection,
   shareFromAmount,
   shareRounded,
   splitFinal,
@@ -864,6 +869,184 @@ describe("v8: the share bar split (splitFinal / shareRounded)", () => {
       for (const key of ["small", "later", "cash", "costs"] as const) {
         expect(c.whatIf.barSr[key].length).toBeGreaterThan(10);
       }
+    }
+  });
+});
+
+/* ---------------------------------------------------------------- */
+/* v10 — the spending receipt maths (spec §6.7, test 48)             */
+/* ---------------------------------------------------------------- */
+describe("v10: the spending receipt (spec §6.7, test 48)", () => {
+  test("normalizeToMonthly is exact: daily 3 → 91.25 exactly", () => {
+    expect(normalizeToMonthly(3, "daily")).toBe(91.25);
+  });
+  test("weekly 10 → 43.33… (520/12, full precision)", () => {
+    expect(normalizeToMonthly(10, "weekly")).toBeCloseTo(520 / 12, 12);
+  });
+  test("yearly 120 → 10 exactly", () => {
+    expect(normalizeToMonthly(120, "yearly")).toBe(10);
+  });
+  test("monthly 50 → 50 (the identity)", () => {
+    expect(normalizeToMonthly(50, "monthly")).toBe(50);
+  });
+  test("NaN and infinite inputs normalize to 0 (never a broken page)", () => {
+    expect(normalizeToMonthly(NaN, "daily")).toBe(0);
+    expect(normalizeToMonthly(Infinity, "monthly")).toBe(0);
+  });
+
+  test("the three examples combine to 34.97 a month and 419.64 a year (exact)", () => {
+    const monthly = RECEIPT_EXAMPLES.reduce((n, e) => n + normalizeToMonthly(e.amount, e.cadence), 0);
+    // 13.99 + 10.99 + 9.99 = 34.97 — the float sum is exact to the cent
+    expect(Math.round(monthly * 100) / 100).toBe(34.97);
+    expect(Math.round(monthly * 12 * 100) / 100).toBe(419.64);
+  });
+  test("the examples' own labels carry both languages", () => {
+    for (const e of RECEIPT_EXAMPLES) {
+      expect(e.label.length).toBeGreaterThan(2);
+      expect(e.labelFa.length).toBeGreaterThan(2);
+      expect(e.amount).toBeGreaterThan(0);
+      expect(e.cadence).toBe("monthly");
+    }
+    expect(RECEIPT_EXAMPLES.length).toBe(3);
+  });
+
+  test("the wrapper equals computeCompound on the same leaked plan", () => {
+    // The page's live plan (share mode + salary + increase) must give the
+    // same receipt projection as a plain amount plan built from the total.
+    const pagePlan = basePlan({
+      salary: 90_000 / 12,
+      share: 0.03,
+      useShare: true,
+      age: 40,
+      startingAmount: 5_000,
+      yearlyIncrease: 0.025,
+      yearlyCost: 0.002,
+      feePerPurchase: 10,
+      purchaseEveryMonths: 3,
+      inflation: 0.0277,
+    });
+    const manual = basePlan({
+      monthly: 225,
+      yearlyCost: 0.002,
+      feePerPurchase: 10,
+      purchaseEveryMonths: 3,
+      inflation: 0.0277,
+    });
+    const viaWrapper = receiptProjection(pagePlan, 225, 10, SEVEN);
+    const direct = computeCompound(manual, SEVEN, 120);
+    expect(viaWrapper.finalValue).toBe(direct.finalValue);
+    expect(viaWrapper.totalPutIn).toBe(direct.totalPutIn);
+    expect(viaWrapper.growth).toBe(direct.growth);
+    expect(viaWrapper.finalValueToday).toBe(direct.finalValueToday);
+    // The wrapper keeps the page's plan object untouched (pure).
+    expect(pagePlan.useShare).toBe(true);
+    expect(pagePlan.startingAmount).toBe(5_000);
+  });
+
+  test("spot vector: the examples 34.97/mo, 10y, AU shares 7.2% − 0.2% → final ≈ 5,982", () => {
+    const AU_SHARES = figuresOf(assetById("AU", "australian-shares")!);
+    const plan = basePlan({ yearlyCost: 0.002, inflation: 0.0277 });
+    const r = receiptProjection(plan, 34.97, 10, AU_SHARES);
+    expect(within(r.finalValue, 5_981.68, 0.5)).toBe(true);
+    expect(Math.round(r.finalValue / 100) * 100).toBe(6_000); // "about 6,000"
+    expect(r.totalPutIn).toBeCloseTo(4_196.4, 6);
+    expect(r.growth).toBeCloseTo(1_785.28, 1);
+    expect(Math.round(r.finalValueToday / 100) * 100).toBe(4_600); // "about 4,600"
+  });
+
+  test("the horizon set: 3/5/10 years give the spec's finals", () => {
+    const AU_SHARES = figuresOf(assetById("AU", "australian-shares")!);
+    const plan = basePlan({ yearlyCost: 0.002, inflation: 0.0277 });
+    expect(within(receiptProjection(plan, 34.97, 3, AU_SHARES).finalValue, 1_391.86, 0.5)).toBe(true);
+    expect(within(receiptProjection(plan, 34.97, 5, AU_SHARES).finalValue, 2_489.72, 0.5)).toBe(true);
+    expect(within(receiptProjection(plan, 34.97, 10, AU_SHARES).finalValue, 5_981.68, 0.5)).toBe(true);
+    expect(RECEIPT_HORIZONS).toEqual([3, 5, 10]);
+    expect(RECEIPT_HORIZON_DEFAULT).toBe(10);
+  });
+
+  test("the owner's own example: 127/mo, 10y → final ≈ 21,724 → 'about 21,700'", () => {
+    const AU_SHARES = figuresOf(assetById("AU", "australian-shares")!);
+    const plan = basePlan({ yearlyCost: 0.002, inflation: 0.0277 });
+    const r = receiptProjection(plan, 127, 10, AU_SHARES);
+    expect(within(r.finalValue, 21_723.57, 0.5)).toBe(true);
+    expect(Math.round(r.finalValue / 100) * 100).toBe(21_700);
+    expect(r.totalPutIn).toBe(15_240);
+    expect(r.growth).toBeCloseTo(6_483.57, 1);
+  });
+
+  test("zero items, zero total, huge amounts: never NaN, never a broken result", () => {
+    const AU_SHARES = figuresOf(assetById("AU", "australian-shares")!);
+    const plan = basePlan({ yearlyCost: 0.002, inflation: 0.0277 });
+    // zero horizon (zero items never reach here, but the maths must hold)
+    const zero = receiptProjection(plan, 0, 10, AU_SHARES);
+    expect(Number.isFinite(zero.finalValue)).toBe(true);
+    expect(zero.finalValue).toBe(0);
+    expect(zero.neverInvests).toBe(false);
+    // a huge leak money: 999,999 a month, 10 years
+    const huge = receiptProjection(plan, 999_999, 10, AU_SHARES);
+    expect(Number.isFinite(huge.finalValue)).toBe(true);
+    expect(huge.finalValue).toBeGreaterThan(0);
+    expect(Number.isNaN(huge.finalValueToday)).toBe(false);
+    // a huge fee eats the total: the engine's own never-invests path
+    const eaten = receiptProjection({ ...plan, feePerPurchase: 5_000 }, 34.97, 10, AU_SHARES);
+    expect(eaten.neverInvests).toBe(true);
+    expect(Number.isFinite(eaten.finalValue)).toBe(true);
+  });
+
+  test("the honest edge: a 0% rate plan (net −0.2% after the cost) hides the bar", () => {
+    const AU_SHARES = figuresOf(assetById("AU", "australian-shares")!);
+    const plan = basePlan({ yearlyCost: 0.002, inflation: 0.0277, rateMode: "custom-rate", customRate: 0 });
+    const r = receiptProjection(plan, 34.97, 10, AU_SHARES);
+    expect(r.finalValue).toBeLessThan(r.totalPutIn);
+    expect(splitFinal(r.finalValue, r.totalPutIn)).toBeNull();
+    expect(splitFinal(r.finalValueToday, r.totalPutInToday)).toBeNull();
+  });
+
+  test("the copy keys exist in both languages (fa + EN)", async () => {
+    const { COPY } = await import("../src/lib/compound/content");
+    for (const locale of ["en", "fa"] as const) {
+      const c = COPY[locale].tool.receipt;
+      expect(c.heading.length).toBeGreaterThan(3);
+      expect(c.lede.length).toBeGreaterThan(10);
+      expect(c.hint.length).toBeGreaterThan(5);
+      expect(c.formLabel.length).toBeGreaterThan(2);
+      expect(c.priceLabel.length).toBeGreaterThan(2);
+      expect(c.cadenceLabel.length).toBeGreaterThan(2);
+      expect(c.addLabel.length).toBeGreaterThan(1);
+      for (const k of ["daily", "weekly", "monthly", "yearly"] as const) {
+        expect(c.cadences[k].length).toBeGreaterThan(2);
+      }
+      expect(c.defaultItemLabel).toContain("{n}");
+      expect(c.totalMonthly.length).toBeGreaterThan(3);
+      expect(c.totalYearly.length).toBeGreaterThan(3);
+      expect(c.projectionTitle.length).toBeGreaterThan(3);
+      expect(c.horizonLabel.length).toBeGreaterThan(3);
+      expect(c.projectionSentence).toContain("{amount}");
+      expect(c.projectionSentence).toContain("{years}");
+      expect(c.projectionSentence).toContain("{final}");
+      expect(c.projectionSentence).toContain("{today}");
+      expect(c.fromLine).toContain("{putIn}");
+      expect(c.fromLine).toContain("{growth}");
+      expect(c.assumption).toContain("{asset}");
+      expect(c.barSr).toContain("{put}");
+      expect(c.barSr).toContain("{growth}");
+      expect(c.zinger.length).toBeGreaterThan(10);
+      expect(c.thanks.length).toBeGreaterThan(3);
+      expect(c.emptyHint.length).toBeGreaterThan(5);
+      expect(c.clearAll.length).toBeGreaterThan(3);
+      expect(c.clearConfirm.length).toBeGreaterThan(3);
+      expect(c.removeAria).toContain("{item}");
+      expect(c.removeAria).toContain("{price}");
+      expect(c.removeAria).toContain("{cadence}");
+      expect(c.announceAdd).toContain("{item}");
+      expect(c.announceAdd).toContain("{total}");
+      expect(c.announceRemove).toContain("{item}");
+      expect(c.announceRemove).toContain("{total}");
+      expect(c.announceClear).toContain("{hint}");
+      expect(c.srSummary).toContain("{n}");
+      expect(c.srSummary).toContain("{monthly}");
+      expect(c.srSummary).toContain("{yearly}");
+      expect(c.srSummary).toContain("{final}");
     }
   });
 });

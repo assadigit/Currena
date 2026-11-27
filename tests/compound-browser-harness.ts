@@ -83,6 +83,8 @@ async function main() {
     "mode-", "add-salary", "salary-", "percent-",
     // v9: the chart's layer filter chips (the customizable graph).
     "chart-toggle",
+    // v10: the spending receipt (below the fold — its own controls).
+    "receipt-",
   ];
   const forbidden = controlInventory.filter(
     (c) => !allowedPrefixes.some((p) => c.cw.startsWith(p)),
@@ -741,7 +743,9 @@ async function main() {
 
   // v8-2: the default screen's inventory gains the bar and nothing
   // else — the same allowed set as test 13 (no new interactive
-  // elements; the bar is pure divs), plus the bar itself.
+  // elements; the bar is pure divs), plus the bar itself. (v10: the
+  // receipt's own controls join the allowed set here too, exactly as
+  // in test 13 — they live below the fold, never on the default screen.)
   const inventoryWithBar = await page.evaluate(() => {
     const main = document.querySelector("main")!;
     const interactive = [...main.querySelectorAll("button, input, select, a[href]")]
@@ -755,6 +759,8 @@ async function main() {
       "country-", "amount-", "years-", "asset-", "more-options", "save-card", "money-", "card-menu",
       "later-", "how", "tools-link", "mode-", "add-salary", "salary-", "percent-",
       "chart-toggle",
+      // v10: the spending receipt's own controls (below the fold).
+      "receipt-",
     ];
     return {
       unexpected: interactive.filter((c) => !c.insideBar && !allowed.some((p) => c.cw.startsWith(p))).length,
@@ -1365,6 +1371,584 @@ async function main() {
     const on = await page.getAttribute(`[data-cw="chart-toggle-${id}"]`, "aria-pressed");
     if (on === "true") await page.click(`[data-cw="chart-toggle-${id}"]`);
   }
+
+  /* ---------------------------------------------------------------- *
+   * v10 — the spending receipt (spec §5.5, tests 50–52)
+   * ---------------------------------------------------------------- */
+  // Start from the canonical default (a reload — which also proves the
+  // receipt resets to the three examples; store-nothing, v10-11).
+  await page.reload({ waitUntil: "networkidle" });
+  await page.waitForSelector("[data-cw=receipt-paper]");
+
+  // v10-1: the three examples on arrival, the exact totals, the hint,
+  // and the projection visible at the default horizon (10).
+  const receiptArrival = await page.evaluate(() => {
+    const items = [...document.querySelectorAll("[data-cw=receipt-item]")].map((li) => {
+      const price = li.querySelector("span[dir=ltr]") as HTMLElement | null;
+      return {
+        label: (li.querySelector("span")?.textContent ?? "").trim(),
+        price: price?.textContent ?? "",
+        removeAria: li.querySelector("[data-cw=receipt-remove]")?.getAttribute("aria-label") ?? "",
+      };
+    });
+    return {
+      items,
+      monthly: document.querySelector("[data-cw=receipt-total-monthly]")?.textContent ?? "",
+      yearly: document.querySelector("[data-cw=receipt-total-yearly]")?.textContent ?? "",
+      hint: document.querySelector("[data-cw=receipt-hint]")?.textContent ?? "",
+      sentence: document.querySelector("[data-cw=receipt-sentence]")?.textContent ?? "",
+      fromLine: document.querySelector("[data-cw=receipt-fromline]")?.textContent ?? "",
+      assumption: document.querySelector("[data-cw=receipt-assumption]")?.textContent ?? "",
+      horizon10: document.querySelector("[data-cw=receipt-horizon-10]")?.getAttribute("aria-pressed"),
+      barSegments: document.querySelectorAll("[data-cw=receipt-bar] [data-cw=share-bar] > div").length,
+      sr: document.querySelector("[data-cw=receipt-sr]")?.textContent ?? "",
+    };
+  });
+  check(
+    "v10-1-examples-on-arrival",
+    receiptArrival.items.length === 3 &&
+      ["YouTube Premium", "Spotify", "iCloud+ 2TB"].every((l) => receiptArrival.items.some((i) => i.label === l)) &&
+      receiptArrival.monthly.includes("A$34.97") &&
+      receiptArrival.yearly.includes("A$419.64") &&
+      (receiptArrival.hint ?? "").includes("examples") &&
+      receiptArrival.sentence.includes("A$34.97") &&
+      receiptArrival.sentence.includes("about A$6,000") &&
+      receiptArrival.sentence.includes("about A$4,600") &&
+      receiptArrival.fromLine.includes("A$4,200") &&
+      receiptArrival.fromLine.includes("A$1,790") &&
+      receiptArrival.assumption.includes("Australian shares") &&
+      receiptArrival.horizon10 === "true" &&
+      receiptArrival.barSegments === 2 &&
+      receiptArrival.sr.includes("A$34.97") &&
+      receiptArrival.sr.includes("A$6,000"),
+    `items ${JSON.stringify(receiptArrival.items.map((i) => i.label))}, monthly ${receiptArrival.monthly}, sentence ${(receiptArrival.sentence ?? "").slice(0, 90)}`,
+  );
+
+  // v10-2: add (label + price + cadence) updates totals, projection and
+  // the live region; the What and Price clear; the cadence persists.
+  await page.fill("[data-cw=receipt-what]", "Netflix");
+  await page.fill("[data-cw=receipt-price]", "15.98");
+  await page.selectOption("[data-cw=receipt-cadence]", "monthly");
+  await page.click("[data-cw=receipt-add]");
+  await page.waitForTimeout(200);
+  const afterAdd = await page.evaluate(() => ({
+    monthly: document.querySelector("[data-cw=receipt-total-monthly]")?.textContent ?? "",
+    live: document.querySelector("[data-cw=receipt-live]")?.textContent ?? "",
+    what: (document.querySelector("[data-cw=receipt-what]") as HTMLInputElement)?.value ?? "",
+    price: (document.querySelector("[data-cw=receipt-price]") as HTMLInputElement)?.value ?? "",
+    cadence: (document.querySelector("[data-cw=receipt-cadence]") as HTMLSelectElement)?.value ?? "",
+    sentence: document.querySelector("[data-cw=receipt-sentence]")?.textContent ?? "",
+    itemCount: document.querySelectorAll("[data-cw=receipt-item]").length,
+    hint: document.querySelector("[data-cw=receipt-hint]") === null,
+  }));
+  check(
+    "v10-2-add-updates-all",
+    afterAdd.monthly.includes("A$50.95") &&
+      afterAdd.live === "Added Netflix. Total A$50.95 a month." &&
+      afterAdd.what === "" &&
+      afterAdd.price === "" &&
+      afterAdd.cadence === "monthly" &&
+      afterAdd.sentence.includes("A$50.95") &&
+      afterAdd.itemCount === 4 &&
+      afterAdd.hint,
+    JSON.stringify({ monthly: afterAdd.monthly, live: afterAdd.live, sentence: afterAdd.sentence.slice(0, 60) }),
+  );
+
+  // v10-5: cadence through the UI — $120 yearly adds exactly 10 to the
+  // monthly total (yearly × 1/12), and the cadence persists after add.
+  await page.fill("[data-cw=receipt-what]", "Domain name");
+  await page.fill("[data-cw=receipt-price]", "120");
+  await page.selectOption("[data-cw=receipt-cadence]", "yearly");
+  await page.click("[data-cw=receipt-add]");
+  await page.waitForTimeout(200);
+  const afterYearly = await page.evaluate(() => ({
+    monthly: document.querySelector("[data-cw=receipt-total-monthly]")?.textContent ?? "",
+    cadence: (document.querySelector("[data-cw=receipt-cadence]") as HTMLSelectElement)?.value ?? "",
+    lastLine: [...document.querySelectorAll("[data-cw=receipt-item]")].pop()?.textContent ?? "",
+  }));
+  check(
+    "v10-5-cadence-normalization",
+    afterYearly.monthly.includes("A$60.95") && afterYearly.cadence === "yearly" && afterYearly.lastLine.includes("A$120.00"),
+    `monthly ${afterYearly.monthly}, cadence kept ${afterYearly.cadence}, line ${afterYearly.lastLine.slice(0, 50)}`,
+  );
+
+  // v10-3: remove — the item leaves, the totals and the live region update.
+  await page.click('[data-cw=receipt-remove][aria-label*="Spotify"]');
+  await page.waitForTimeout(200);
+  const afterRemove = await page.evaluate(() => ({
+    monthly: document.querySelector("[data-cw=receipt-total-monthly]")?.textContent ?? "",
+    live: document.querySelector("[data-cw=receipt-live]")?.textContent ?? "",
+    spotifyGone: ![...document.querySelectorAll("[data-cw=receipt-item]")].some((li) =>
+      (li.textContent ?? "").includes("Spotify"),
+    ),
+    count: document.querySelectorAll("[data-cw=receipt-item]").length,
+  }));
+  check(
+    "v10-3-remove",
+    afterRemove.spotifyGone && afterRemove.count === 4 && afterRemove.monthly.includes("A$49.96") &&
+      afterRemove.live === "Removed Spotify. Total A$49.96 a month.",
+    `monthly ${afterRemove.monthly}, live ${afterRemove.live}`,
+  );
+
+  // v10-7: the projection's numbers match an independent reference at
+  // the page's own current rate (read the measured line, like the v6
+  // grid-vs-live check). The loop below is the reference method ported
+  // line for line (end-of-month deposits, monthly rate (1+r)^(1/12)−1,
+  // the plan's 0.2% cost), never the page's own engine code.
+  const measuredRate = await page.evaluate(() => {
+    const line = document.querySelector("[data-cw=measured-line]")?.textContent ?? "";
+    const m = line.match(/([\d.]+)%\s*·\s*20 years/);
+    return m ? Number(m[1]) : NaN;
+  });
+  const refFinal = (() => {
+    const rNet = (measuredRate - 0.2) / 100;
+    const i = Math.pow(1 + rNet, 1 / 12) - 1;
+    let balance = 0;
+    for (let m = 1; m <= 120; m++) {
+      balance = balance * (1 + i) + 49.96;
+    }
+    return Math.round(balance / 100) * 100;
+  })();
+  const sentenceNow = await page.textContent("[data-cw=receipt-sentence]");
+  check(
+    "v10-7-projection-matches-reference",
+    Number.isFinite(measuredRate) &&
+      measuredRate === 7.2 &&
+      sentenceNow?.includes(`about A$${refFinal.toLocaleString("en-US")}`),
+    `measured ${measuredRate}% → reference about A$${refFinal.toLocaleString("en-US")}; page says ${(sentenceNow ?? "").slice(0, 95)}`,
+  );
+
+  // v10-8: label-in-name on every remove button.
+  const removeLabels = await page.evaluate(() =>
+    [...document.querySelectorAll("[data-cw=receipt-remove]")].map((b) => ({
+      aria: b.getAttribute("aria-label") ?? "",
+      item: (b.closest("li")?.querySelector("span")?.textContent ?? "").trim(),
+    })),
+  );
+  check(
+    "v10-8-label-in-name",
+    removeLabels.length === 4 &&
+      removeLabels.every((r) => r.aria.startsWith("Remove ") && r.aria.includes(r.item) && /\d/.test(r.aria)),
+    removeLabels.map((r) => r.aria).join(" | ").slice(0, 140),
+  );
+
+  // v10-9: keyboard-only — add, remove and clear without any pointer.
+  // (The select is keyboard-driven the native way: "m" picks Monthly —
+  // the cadence had persisted as Yearly from v10-5, which is its own
+  // checked feature.)
+  await page.focus("[data-cw=receipt-what]");
+  await page.keyboard.type("Gym membership");
+  await page.keyboard.press("Tab");
+  await page.keyboard.type("55");
+  await page.keyboard.press("Tab"); // the cadence select
+  await page.keyboard.press("m"); // native select: first-letter jump to Monthly
+  await page.keyboard.press("Tab"); // the Add button
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(200);
+  const kbAdd = await page.evaluate(() => ({
+    monthly: document.querySelector("[data-cw=receipt-total-monthly]")?.textContent ?? "",
+    has: [...document.querySelectorAll("[data-cw=receipt-item]")].some((li) => (li.textContent ?? "").includes("Gym membership")),
+  }));
+  await page.focus('[data-cw=receipt-remove][aria-label*="Netflix"]');
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(200);
+  const kbRemove = await page.evaluate(() => ({
+    netflixGone: ![...document.querySelectorAll("[data-cw=receipt-item]")].some((li) => (li.textContent ?? "").includes("Netflix")),
+    live: document.querySelector("[data-cw=receipt-live]")?.textContent ?? "",
+  }));
+  await page.focus("[data-cw=receipt-clear]");
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(150);
+  const kbClear1 = await page.textContent("[data-cw=receipt-clear]");
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(200);
+  const kbClear2 = await page.evaluate(() => ({
+    count: document.querySelectorAll("[data-cw=receipt-item]").length,
+    empty: document.querySelector("[data-cw=receipt-empty]")?.textContent ?? "",
+    live: document.querySelector("[data-cw=receipt-live]")?.textContent ?? "",
+    focused: document.activeElement?.getAttribute("data-cw") ?? "",
+  }));
+  check(
+    "v10-9-keyboard-only",
+    kbAdd.has && kbAdd.monthly.includes("A$104.96") &&
+      kbRemove.netflixGone && kbRemove.live.includes("Removed Netflix") &&
+      kbClear1 === "Sure? Clear all" &&
+      kbClear2.count === 0 && kbClear2.empty.includes("Add a cost") && kbClear2.focused === "receipt-add",
+    `kb add ${kbAdd.monthly}, clear label "${kbClear1}", after: ${kbClear2.count} items, focus ${kbClear2.focused}`,
+  );
+
+  // v10-4: the clear's two-step and its 4-second timeout. The keyboard
+  // flow above left the list empty; re-add one item first.
+  await page.fill("[data-cw=receipt-price]", "5");
+  await page.click("[data-cw=receipt-add]");
+  await page.waitForTimeout(150);
+  await page.click("[data-cw=receipt-clear]");
+  await page.waitForTimeout(150);
+  const armedState = await page.evaluate(() => ({
+    label: document.querySelector("[data-cw=receipt-clear]")?.textContent ?? "",
+    count: document.querySelectorAll("[data-cw=receipt-item]").length,
+  }));
+  await page.waitForTimeout(4300); // the 4-second disarm timeout
+  const disarmedState = await page.evaluate(() => ({
+    label: document.querySelector("[data-cw=receipt-clear]")?.textContent ?? "",
+    count: document.querySelectorAll("[data-cw=receipt-item]").length,
+  }));
+  await page.click("[data-cw=receipt-clear]"); // re-arms (not clears — disarmed)
+  await page.waitForTimeout(150);
+  const reArmed = await page.evaluate(() => ({
+    label: document.querySelector("[data-cw=receipt-clear]")?.textContent ?? "",
+    count: document.querySelectorAll("[data-cw=receipt-item]").length,
+  }));
+  await page.click("[data-cw=receipt-clear]"); // second tap clears
+  await page.waitForTimeout(150);
+  const clearedState = await page.evaluate(() => ({
+    count: document.querySelectorAll("[data-cw=receipt-item]").length,
+    empty: document.querySelector("[data-cw=receipt-empty]")?.textContent ?? "",
+    monthly: document.querySelector("[data-cw=receipt-total-monthly]")?.textContent ?? "",
+    projectionGone: document.querySelector("[data-cw=receipt-sentence]") === null,
+  }));
+  check(
+    "v10-4-clear-two-step",
+    armedState.label === "Sure? Clear all" && armedState.count === 1 &&
+      disarmedState.label === "Clear all" && disarmedState.count === 1 &&
+      reArmed.label === "Sure? Clear all" && reArmed.count === 1 &&
+      clearedState.count === 0 && clearedState.empty.includes("Add a cost") &&
+      clearedState.monthly.includes("A$0.00") && clearedState.projectionGone,
+    `armed "${armedState.label}" (1 item), after 4.3s "${disarmedState.label}" (1 item), re-arm, cleared → ${clearedState.count} items`,
+  );
+
+  // v10-6: validation — an empty price rejects with one small plain
+  // message; a huge price clamps to the bound (999,999) with the same
+  // message. Never an error state.
+  await page.fill("[data-cw=receipt-what]", "Nothing");
+  await page.click("[data-cw=receipt-add]");
+  await page.waitForTimeout(150);
+  const emptyPrice = await page.evaluate(() => ({
+    note: document.querySelector("[data-cw=receipt-note]")?.textContent ?? "",
+    count: document.querySelectorAll("[data-cw=receipt-item]").length,
+  }));
+  await page.fill("[data-cw=receipt-what]", "Everything");
+  await page.fill("[data-cw=receipt-price]", "2000000");
+  await page.selectOption("[data-cw=receipt-cadence]", "monthly");
+  await page.click("[data-cw=receipt-add]");
+  await page.waitForTimeout(150);
+  const hugePrice = await page.evaluate(() => {
+    const last = [...document.querySelectorAll("[data-cw=receipt-item]")].pop();
+    return {
+      note: document.querySelector("[data-cw=receipt-note]")?.textContent ?? "",
+      count: document.querySelectorAll("[data-cw=receipt-item]").length,
+      lastLine: last?.textContent ?? "",
+      monthly: document.querySelector("[data-cw=receipt-total-monthly]")?.textContent ?? "",
+      sentenceFinite: document.querySelector("[data-cw=receipt-sentence]")?.textContent ?? "",
+    };
+  });
+  check(
+    "v10-6-clamp-message",
+    (emptyPrice.note ?? "").includes("outside the allowed range") && emptyPrice.count === 0 &&
+      hugePrice.count === 1 && hugePrice.lastLine.includes("A$999,999.00") &&
+      (hugePrice.note ?? "").includes("outside the allowed range") &&
+      Number.isFinite(Number((hugePrice.sentenceFinite.match(/A\$([\d,]+)/) ?? [])[1]?.replace(/,/g, ""))),
+    `empty → note "${emptyPrice.note}", count ${emptyPrice.count}; huge → "${hugePrice.lastLine.slice(0, 40)}", monthly ${hugePrice.monthly}`,
+  );
+
+  // v10-10: the sr summary mirrors the visible numbers at the one-item
+  // state — n, the monthly total, the yearly total and the sentence.
+  const srNow = await page.textContent("[data-cw=receipt-sr]");
+  check(
+    "v10-10-sr-summary-mirrors",
+    (srNow ?? "").includes("1 cost") &&
+      (srNow ?? "").includes("A$999,999.00 a month") &&
+      (srNow ?? "").includes("A$11,999,988.00 a year") &&
+      (srNow ?? "").includes("about A$"),
+    JSON.stringify(srNow?.slice(0, 150)),
+  );
+
+  // v10-11: store-nothing rechecked — reload restores the examples and
+  // nothing was ever written.
+  const storageBefore = await page.evaluate(() => ({
+    local: Object.keys(window.localStorage),
+    cookies: document.cookie,
+  }));
+  await page.reload({ waitUntil: "networkidle" });
+  await page.waitForSelector("[data-cw=receipt-paper]");
+  const afterReload = await page.evaluate(() => ({
+    count: document.querySelectorAll("[data-cw=receipt-item]").length,
+    monthly: document.querySelector("[data-cw=receipt-total-monthly]")?.textContent ?? "",
+    hint: document.querySelector("[data-cw=receipt-hint]")?.textContent ?? "",
+    live: document.querySelector("[data-cw=receipt-live]")?.textContent ?? "",
+    sentence: document.querySelector("[data-cw=receipt-sentence]")?.textContent ?? "",
+  }));
+  check(
+    "v10-11-reload-restores-examples",
+    storageBefore.local.length === 0 && storageBefore.cookies === "" &&
+      afterReload.count === 3 && afterReload.monthly.includes("A$34.97") &&
+      (afterReload.hint ?? "").includes("examples") && afterReload.live === "" &&
+      afterReload.sentence.includes("about A$6,000"),
+    `${afterReload.count} items, monthly ${afterReload.monthly}, hint ${afterReload.hint ? "back" : "MISSING"}`,
+  );
+
+  // v10-12: the default-screen inventory gains exactly the receipt's
+  // own controls, and the one-screen rule holds at the three sizes with
+  // the receipt present (it lives below the fold).
+  const receiptInventory = await page.evaluate(() => {
+    const main = document.querySelector("main")!;
+    const ids = [...main.querySelectorAll("button, input, select")]
+      .map((el) => el.getAttribute("data-cw") ?? "")
+      .filter((cw) => cw.startsWith("receipt-"));
+    return ids;
+  });
+  const expectedReceiptIds = [
+    "receipt-what", "receipt-price", "receipt-cadence", "receipt-add",
+    "receipt-remove", "receipt-remove", "receipt-remove",
+    "receipt-clear", "receipt-horizon-3", "receipt-horizon-5", "receipt-horizon-10",
+  ];
+  const oneScreenOk: boolean[] = [];
+  for (const [w, h] of [[390, 844], [360, 800], [430, 932]] as const) {
+    await page.setViewportSize({ width: w, height: h });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(350);
+    const fit = await page.evaluate(() => {
+      const vp = window.innerHeight;
+      const headline = document.querySelector("[data-cw=headline]")!.getBoundingClientRect();
+      const chips = document.querySelector("[data-cw=asset-chips]")!.getBoundingClientRect();
+      const receipt = document.getElementById("spending-receipt")!.getBoundingClientRect();
+      return {
+        headlineVisible: headline.bottom <= vp && headline.top >= 0,
+        controlsVisible: chips.bottom <= vp,
+        receiptBelowFold: receipt.top > vp,
+        scrollW: document.documentElement.scrollWidth,
+      };
+    });
+    oneScreenOk.push(fit.headlineVisible && fit.controlsVisible && fit.receiptBelowFold && fit.scrollW <= w);
+  }
+  await page.setViewportSize({ width: 1280, height: 900 });
+  check(
+    "v10-12-default-screen-untouched",
+    JSON.stringify(receiptInventory.sort()) === JSON.stringify(expectedReceiptIds.sort()) &&
+      oneScreenOk.length === 3 && oneScreenOk.every(Boolean),
+    `receipt controls ${JSON.stringify(receiptInventory)}, one-screen ${oneScreenOk.join("/")}`,
+  );
+
+  // v10-13 (test 51): the projection follows the plan — switch asset →
+  // the assumption line and the numbers change.
+  await page.click("[data-cw=asset-gold]");
+  await page.waitForTimeout(300);
+  const goldProjection = await page.evaluate(() => ({
+    assumption: document.querySelector("[data-cw=receipt-assumption]")?.textContent ?? "",
+    sentence: document.querySelector("[data-cw=receipt-sentence]")?.textContent ?? "",
+  }));
+  check(
+    "v10-13-follows-asset",
+    goldProjection.assumption.includes("Gold") && !goldProjection.sentence.includes("about A$6,000"),
+    `assumption "${goldProjection.assumption}", sentence ${(goldProjection.sentence ?? "").slice(0, 85)}`,
+  );
+
+  // v10-14 (test 51): costs on/off change the numbers — the yearly cost
+  // 3% lowers the projection; back at 0.2% the arrival vector returns.
+  await page.click('[data-cw="asset-australian-shares"]');
+  await page.waitForTimeout(200);
+  await page.click("[data-cw=more-options]");
+  await page.waitForSelector("[data-cw=more-options-groups]");
+  await page.click("[data-cw=group-costs-toggle]");
+  await page.waitForSelector("#cw-cost");
+  await page.fill("#cw-cost", "3");
+  await page.waitForTimeout(400);
+  const costly = await page.textContent("[data-cw=receipt-sentence]");
+  await page.fill("#cw-cost", "0.2");
+  await page.waitForTimeout(400);
+  const cheap = await page.textContent("[data-cw=receipt-sentence]");
+  check(
+    "v10-14-follows-costs",
+    (costly ?? "") !== (cheap ?? "") && !costly?.includes("about A$6,000") && cheap?.includes("about A$6,000"),
+    `3% cost → ${(costly ?? "").slice(0, 70)} | 0.2% → ${(cheap ?? "").slice(0, 70)}`,
+  );
+
+  // v10-15 (test 51): the honest edge through the UI — a 0% custom
+  // rate (net −0.2% after the plan's cost) hides the bar and keeps the
+  // sentence.
+  await page.click("[data-cw=group-rates-toggle]");
+  await page.click('[data-cw="rate-mode"] button:has-text("Custom rate")');
+  await page.waitForSelector("#cw-crate");
+  await page.fill("#cw-crate", "0");
+  await page.waitForSelector("[data-cw=receipt-sentence]");
+  const zeroRate = await page.evaluate(() => ({
+    barInPaper: document.querySelectorAll("[data-cw=receipt-bar] [data-cw=share-bar]").length,
+    sentence: document.querySelector("[data-cw=receipt-sentence]")?.textContent ?? "",
+    todayBeside: document.querySelector("[data-cw=receipt-sentence]")?.textContent.includes("today's money"),
+  }));
+  await page.click('[data-cw="rate-mode"] button:has-text("Average")');
+  await page.waitForTimeout(300);
+  check(
+    "v10-15-honest-edge-bar-hidden",
+    zeroRate.barInPaper === 0 && zeroRate.sentence.length > 20 && zeroRate.todayBeside,
+    `bar ${zeroRate.barInPaper}, sentence kept: ${zeroRate.sentence.slice(0, 80)}`,
+  );
+
+  // v10-16 (test 51): the never-invests plain sentence when a large fee
+  // eats the monthly total. (The Costs fold is already open from v10-14 —
+  // open it only if it is not.)
+  if ((await page.locator("#cw-fee").count()) === 0) await page.click("[data-cw=group-costs-toggle]");
+  await page.waitForSelector("#cw-fee");
+  await page.fill("#cw-fee", "5000");
+  await page.locator("[data-cw=receipt-never-invests]").waitFor({ timeout: 10000 });
+  const never = await page.evaluate(() => ({
+    line: document.querySelector("[data-cw=receipt-never-invests]")?.textContent ?? "",
+    sentenceGone: document.querySelector("[data-cw=receipt-sentence]") === null,
+    barGone: document.querySelectorAll("[data-cw=receipt-bar] [data-cw=share-bar]").length === 0,
+    sr: document.querySelector("[data-cw=receipt-sr]")?.textContent ?? "",
+  }));
+  check(
+    "v10-16-never-invests",
+    never.line.includes("cost eats every purchase") && never.sentenceGone && never.barGone &&
+      never.sr.includes("cost eats every purchase"),
+    `"${never.line.slice(0, 60)}", sentence gone: ${never.sentenceGone}, sr carries it`,
+  );
+
+  // v10-17 (test 52): fa/RTL — Persian digits, mirrored leaders, the fa
+  // fonts, and ٪ inside the bar's sr sentence. Reload resets the costs
+  // first (store-nothing).
+  await page.reload({ waitUntil: "networkidle" });
+  await page.waitForSelector("[data-cw=receipt-paper]");
+  await page.click('header button:has-text("فا")');
+  await page.waitForTimeout(400);
+  const faReceipt = await page.evaluate(() => {
+    const sec = document.getElementById("spending-receipt")!;
+    const item = sec.querySelector("[data-cw=receipt-item]")!;
+    const label = item.querySelector("span")!.getBoundingClientRect();
+    const amount = item.querySelector("span[dir=ltr]")!.getBoundingClientRect();
+    return {
+      dir: sec.closest("[dir]")?.getAttribute("dir") ?? getComputedStyle(sec).direction,
+      heading: sec.querySelector("h2")?.textContent ?? "",
+      monthly: document.querySelector("[data-cw=receipt-total-monthly]")?.textContent ?? "",
+      hasPersianDigits: /[۰-۹]/.test(document.querySelector("[data-cw=receipt-total-monthly]")?.textContent ?? ""),
+      labelRightOfAmount: label.x > amount.x, // mirrored: label at the reading start (right)
+      font: getComputedStyle(sec.querySelector("[data-cw=receipt-lines]")!).fontFamily,
+      barSr: document.querySelector("[data-cw=receipt-bar] [data-cw=share-bar]")?.getAttribute("aria-label") ?? "",
+      sr: document.querySelector("[data-cw=receipt-sr]")?.textContent ?? "",
+      sentence: document.querySelector("[data-cw=receipt-sentence]")?.textContent ?? "",
+      addLabel: document.querySelector("[data-cw=receipt-add]")?.textContent ?? "",
+    };
+  });
+  check(
+    "v10-17-fa-rtl",
+    faReceipt.dir === "rtl" &&
+      faReceipt.heading === "رسید خرج‌های شما" &&
+      faReceipt.monthly.includes("۳۴٫۹۷") &&
+      faReceipt.hasPersianDigits &&
+      faReceipt.labelRightOfAmount &&
+      !faReceipt.font.includes("monospace") && // fa uses the site's own Persian font
+      faReceipt.barSr.includes("٪") &&
+      faReceipt.sr.includes("۳۴٫۹۷") &&
+      (faReceipt.sentence ?? "").includes("۶٬۰۰۰") &&
+      faReceipt.addLabel === "اضافه کردن",
+    `dir ${faReceipt.dir}, monthly ${faReceipt.monthly}, mirrored ${faReceipt.labelRightOfAmount}, bar sr has ٪: ${faReceipt.barSr.includes("٪")}`,
+  );
+
+  // v10-18 (test 52): 360px with a 28-char label wraps, never scrolls
+  // sideways. (Still in fa — a longer Persian-friendly label.)
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.fill("[data-cw=receipt-what]", "ThisIsAVeryLongSubscriptionName28");
+  await page.fill("[data-cw=receipt-price]", "4.50");
+  await page.selectOption("[data-cw=receipt-cadence]", "daily");
+  await page.click("[data-cw=receipt-add]");
+  await page.waitForTimeout(200);
+  const wrap360 = await page.evaluate(() => {
+    const label = [...document.querySelectorAll("[data-cw=receipt-item] span")]
+      .map((s) => s.getBoundingClientRect())
+      .find((r) => r.width > 0);
+    return {
+      scrollW: document.documentElement.scrollWidth,
+      clientW: document.documentElement.clientWidth,
+      labelRight: label ? label.right <= 360 : false,
+    };
+  });
+  check(
+    "v10-18-360-wraps",
+    wrap360.scrollW <= wrap360.clientW && wrap360.labelRight,
+    `scrollW ${wrap360.scrollW}/${wrap360.clientW}, label inside viewport: ${wrap360.labelRight}`,
+  );
+
+  // v10-19 (test 52): the paper's fixed palette is AA in light AND
+  // dark (the pairs are fixed; both themes measured).
+  const paletteAA: boolean[] = [];
+  for (const dark of [false, true]) {
+    await page.evaluate((d) => {
+      document.documentElement.classList.toggle("dark", d);
+    }, dark);
+    await page.waitForTimeout(200);
+    const c = await page.evaluate(() => {
+      const paperEl = document.querySelector("[data-cw=receipt-paper]") as HTMLElement;
+      const inkEl = document.querySelector("[data-cw=receipt-header]") as HTMLElement;
+      // the muted sample: the yearly total line — always rendered on the paper
+      const mutedEl = document.querySelector("[data-cw=receipt-total-yearly]") as HTMLElement;
+      const lum = (s: string) => {
+        const m = s.match(/\d+(\.\d+)?/g)!;
+        const [r, g, b] = m.slice(0, 3).map(Number).map((v) => v / 255).map((v) =>
+          v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4),
+        );
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      };
+      const ratio = (a: string, b: string) => {
+        const la = lum(a), lb = lum(b);
+        return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
+      };
+      const paper = getComputedStyle(paperEl).backgroundColor;
+      return {
+        dark: document.documentElement.classList.contains("dark"),
+        paper,
+        inkRatio: ratio(getComputedStyle(inkEl).color, paper),
+        mutedRatio: ratio(getComputedStyle(mutedEl).color, paper),
+      };
+    });
+    paletteAA.push(c.inkRatio >= 7 && c.mutedRatio >= 4.5);
+  }
+  await page.evaluate(() => document.documentElement.classList.remove("dark"));
+  check(
+    "v10-19-paper-aa-both-themes",
+    paletteAA.length === 2 && paletteAA.every(Boolean),
+    `ink/muted ratios passed in light and dark: ${paletteAA.join("/")}`,
+  );
+
+  // v10-20 (test 52): plain language — the receipt's own text keeps the
+  // sentence discipline (no jargon, average ≤ 15 words). Back to EN.
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.click('header button:has-text("EN")');
+  await page.waitForTimeout(400);
+  const plain = await page.evaluate(() => {
+    const sec = document.getElementById("spending-receipt")!;
+    // Sentence length is measured over sentences (the test-18 method:
+    // split the paragraph text on its enders); jargon over every word.
+    const paragraphs = [...sec.querySelectorAll("p")]
+      .filter((p) => !p.className.includes("sr-only"))
+      .map((p) => (p.textContent ?? "").trim())
+      .filter((t) => t.length > 0);
+    const all = paragraphs.join(" ");
+    const banned = [
+      "CAGR", "compound interest", "annualised", "annualized", "nominal", "real return",
+      "volatility", "ETF", "index fund", "dividend", "yield", "ROI", "APY",
+      "basis point", "expense ratio", "dollar-cost", "hedged", "total return",
+      "net present value", "risk-adjusted", "p.a.", "AUM", "drawdown", "alpha",
+      "benchmark", "securities", "equities", "portfolio",
+    ];
+    // The banned word "p.a." contains regex metacharacters — escape
+    // every banned word before matching (finding: unescaped, "p.a."
+    // matched the plain word "plan"; recorded in the v10 test report).
+    const hits = banned.filter((b) => new RegExp(b.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i").test(all));
+    const sentences = paragraphs
+      .join(" ")
+      .split(/(?<=[.!?])\s+/)
+      .filter((s) => s.trim().length > 3);
+    const avg = sentences.length
+      ? sentences.reduce((n, s) => n + s.trim().split(/\s+/).length, 0) / sentences.length
+      : 0;
+    return { hits, avg: Math.round(avg * 10) / 10, sentences: sentences.length };
+  });
+  check(
+    "v10-20-plain-language",
+    plain.hits.length === 0 && plain.avg <= 15,
+    `jargon ${JSON.stringify(plain.hits)}, avg ${plain.avg} words over ${plain.sentences} sentences`,
+  );
 
   /* ---------------------------------------------------------------- *
    * Routing (test 19) — via a fresh context
